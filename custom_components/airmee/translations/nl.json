@@ -6,7 +6,7 @@
         "title": "Airmee instellen",
         "description": "Kies hoe je je pakketten volgt.",
         "menu_options": {
-          "account": "Account (inloggen met je telefoonnummer)",
+          "account": "Account (automatisch importeren)",
           "tracking": "Trackinglinks"
         }
       },

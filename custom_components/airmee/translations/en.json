@@ -6,7 +6,7 @@
         "title": "Set up Airmee",
         "description": "Choose how to follow your parcels.",
         "menu_options": {
-          "account": "Account (log in with your phone number)",
+          "account": "Account (automatic import)",
           "tracking": "Tracking links"
         }
       },
