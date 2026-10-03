@@ -44,6 +44,13 @@ CAPABILITIES_BY_VARIANT = {
     "Tracking": frozenset({"url", "history"}),
     "Account": frozenset({"history"}),
 }
+
+# Fields not confirmed yet — the docs site shows them as "awaiting data".
+# Move a field into the declaration above once a real parcel shows it.
+PENDING_CAPABILITIES_BY_VARIANT = {
+    "Tracking": frozenset({"delivery_window", "pickup_point"}),
+    "Account": frozenset({"delivery_window", "pickup_point"}),
+}
 # Aliased to the tracking source, as the flat shape the parcel tests check.
 CAPABILITIES = CAPABILITIES_BY_VARIANT["Tracking"]
 
