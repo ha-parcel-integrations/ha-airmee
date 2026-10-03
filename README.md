@@ -12,7 +12,7 @@ A custom Home Assistant integration that tracks your [Airmee](https://airmee.com
 - **Account** — log in with your phone number (Airmee texts you a code). Your parcels are discovered automatically, no per-parcel input.
 - **Tracking links** — add the token from each Airmee tracking link yourself, together with your phone number hash.
 
-> **Pre-release (0.9.0).** Built from the Airmee app's data model and not yet confirmed against a real parcel. Anything the integration cannot read or map is logged once as a warning with a link to report it — please do.
+> ⚠️ **Pre-1.0 release.** Not yet confirmed against a real parcel. Anything the integration cannot read or map is logged once as a warning with a link to report it — please do.
 
 Part of the [ha-parcel-integrations](https://ha-parcel-integrations.github.io/) family: it publishes the same canonical parcel format, statuses and events as the other carrier integrations, so it plugs straight into the [Parcel Aggregator](https://github.com/ha-parcel-integrations/ha-parcel-aggregator) and cross-carrier automations.
 
