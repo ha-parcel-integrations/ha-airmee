@@ -1,0 +1,194 @@
+{
+  "title": "Airmee",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Airmee",
+        "description": "Choose how to follow your parcels.",
+        "menu_options": {
+          "account": "Account (log in with your phone number)",
+          "tracking": "Tracking links"
+        }
+      },
+      "account": {
+        "title": "Log in to Airmee",
+        "description": "Airmee texts you a code. Enter your country code and phone number as you would in the Airmee app.",
+        "data": {
+          "country_code": "Country code",
+          "phone_number": "Phone number"
+        }
+      },
+      "otp": {
+        "title": "Enter the code",
+        "description": "Enter the code Airmee just sent by SMS.",
+        "data": {
+          "otp_code": "SMS code"
+        }
+      },
+      "tracking": {
+        "title": "Track by link",
+        "description": "Add parcels afterwards via the integration options or the `airmee.track_parcel` service. Airmee ties each tracking link to the recipient's phone number hash, so enter yours here.",
+        "data": {
+          "phone_number_hash": "Phone number hash"
+        }
+      },
+      "reconfigure": {
+        "title": "Update the phone number hash",
+        "description": "Enter the recipient's phone number hash again.",
+        "data": {
+          "phone_number_hash": "Phone number hash"
+        }
+      }
+    },
+    "error": {
+      "invalid_phone_number": "Airmee did not accept that phone number.",
+      "invalid_otp": "That code was not accepted.",
+      "invalid_phone_number_hash": "Enter the phone number hash.",
+      "cannot_connect": "Could not reach Airmee."
+    },
+    "abort": {
+      "already_configured": "This Airmee source is already set up.",
+      "wrong_account": "That is a different Airmee account than the one being re-authenticated.",
+      "reauth_successful": "Re-authentication was successful.",
+      "reconfigure_successful": "Settings were updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Airmee options",
+        "menu_options": {
+          "parcels": "Parcels",
+          "settings": "Settings"
+        },
+        "sections": {
+          "parcels": {
+            "name": "Parcels",
+            "data": {
+              "add": "Add a parcel",
+              "remove": "Remove parcels"
+            },
+            "data_description": {
+              "add": "Enter an Airmee tracking code to start tracking it. You find it on the shipping confirmation or the missed-delivery card."
+            }
+          },
+          "delivered": {
+            "name": "Delivered parcels",
+            "data": {
+              "delivered_filter_type": "Filter by",
+              "delivered_filter_amount": "Amount"
+            },
+            "data_description": {
+              "delivered_filter_type": "Show delivered parcels from the last X days, or limit to the X most recent.",
+              "delivered_filter_amount": "Number of days or parcels to show."
+            }
+          },
+          "history": {
+            "name": "Parcel history",
+            "data": {
+              "include_history": "Include status history"
+            },
+            "data_description": {
+              "include_history": "Add a per-parcel history attribute listing each status update (timestamp, status, original text). Off by default."
+            }
+          }
+        }
+      },
+      "parcels": {
+        "title": "Manage parcels",
+        "data": {
+          "tracking_codes": "Tracking codes"
+        }
+      },
+      "settings": {
+        "title": "Settings",
+        "data": {
+          "delivered_filter_type": "Delivered parcels: filter by",
+          "delivered_filter_amount": "Delivered parcels: amount",
+          "include_history": "Include status history"
+        }
+      }
+    },
+    "error": {
+      "invalid_tracking_code": "That does not look like an Airmee tracking code.",
+      "already_tracked": "That parcel is already being tracked."
+    }
+  },
+  "selector": {
+    "delivered_filter_type": {
+      "options": {
+        "days": "Days",
+        "parcels": "Number of parcels"
+      }
+    }
+  },
+  "services": {
+    "track_parcel": {
+      "name": "Track parcel",
+      "description": "Start tracking a parcel by its Airmee tracking code.",
+      "fields": {
+        "tracking_code": {
+          "name": "Tracking code",
+          "description": "The Airmee tracking code."
+        }
+      }
+    },
+    "untrack_parcel": {
+      "name": "Untrack parcel",
+      "description": "Stop tracking a parcel by its Airmee tracking code.",
+      "fields": {
+        "tracking_code": {
+          "name": "Tracking code",
+          "description": "The Airmee tracking code to stop tracking."
+        }
+      }
+    }
+  },
+  "device_automation": {
+    "trigger_type": {
+      "parcel_registered": "A parcel was registered",
+      "parcel_status_changed": "A parcel's status changed",
+      "parcel_delivered": "A parcel was delivered",
+      "parcel_delivery_time_changed": "A parcel's expected delivery time changed"
+    }
+  },
+  "entity": {
+    "button": {
+      "refresh": {
+        "name": "Refresh"
+      }
+    },
+    "calendar": {
+      "deliveries": {
+        "name": "Deliveries"
+      }
+    },
+    "sensor": {
+      "incoming_parcels": {
+        "name": "Incoming parcels",
+        "unit_of_measurement": "parcels"
+      },
+      "next_delivery": {
+        "name": "Next delivery"
+      },
+      "en_route_to_pickup_point": {
+        "name": "En route to pickup point",
+        "unit_of_measurement": "parcels"
+      },
+      "awaiting_pickup": {
+        "name": "Awaiting pickup",
+        "unit_of_measurement": "parcels"
+      },
+      "delivered_parcels": {
+        "name": "Delivered parcels",
+        "unit_of_measurement": "parcels"
+      },
+      "last_update": {
+        "name": "Last successful update"
+      },
+      "parcel": {
+        "name": "Parcel {barcode}"
+      }
+    }
+  }
+}

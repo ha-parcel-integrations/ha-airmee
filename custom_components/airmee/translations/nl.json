@@ -1,0 +1,194 @@
+{
+  "title": "Airmee",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Airmee instellen",
+        "description": "Kies hoe je je pakketten volgt.",
+        "menu_options": {
+          "account": "Account (inloggen met je telefoonnummer)",
+          "tracking": "Trackinglinks"
+        }
+      },
+      "account": {
+        "title": "Inloggen bij Airmee",
+        "description": "Airmee stuurt je een code per sms. Vul je landcode en telefoonnummer in zoals in de Airmee-app.",
+        "data": {
+          "country_code": "Landcode",
+          "phone_number": "Telefoonnummer"
+        }
+      },
+      "otp": {
+        "title": "Voer de code in",
+        "description": "Voer de code in die Airmee zojuist per sms stuurde.",
+        "data": {
+          "otp_code": "Sms-code"
+        }
+      },
+      "tracking": {
+        "title": "Volgen met een link",
+        "description": "Pakketten voeg je daarna toe via de integratie-opties of de service `airmee.track_parcel`. Airmee koppelt elke trackinglink aan de telefoonnummer-hash van de ontvanger; vul die van jou hier in.",
+        "data": {
+          "phone_number_hash": "Telefoonnummer-hash"
+        }
+      },
+      "reconfigure": {
+        "title": "Telefoonnummer-hash bijwerken",
+        "description": "Voer de telefoonnummer-hash van de ontvanger opnieuw in.",
+        "data": {
+          "phone_number_hash": "Telefoonnummer-hash"
+        }
+      }
+    },
+    "error": {
+      "invalid_phone_number": "Airmee accepteerde dat telefoonnummer niet.",
+      "invalid_otp": "Die code is niet geaccepteerd.",
+      "invalid_phone_number_hash": "Vul de telefoonnummer-hash in.",
+      "cannot_connect": "Kan Airmee niet bereiken."
+    },
+    "abort": {
+      "already_configured": "Deze Airmee-bron is al ingesteld.",
+      "wrong_account": "Dit is een ander Airmee-account dan het account dat opnieuw wordt gekoppeld.",
+      "reauth_successful": "Opnieuw koppelen is gelukt.",
+      "reconfigure_successful": "Instellingen zijn bijgewerkt."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Airmee-opties",
+        "menu_options": {
+          "parcels": "Pakketten",
+          "settings": "Instellingen"
+        },
+        "sections": {
+          "parcels": {
+            "name": "Pakketten",
+            "data": {
+              "add": "Pakket toevoegen",
+              "remove": "Pakketten verwijderen"
+            },
+            "data_description": {
+              "add": "Voer een Airmee-trackingcode in om het pakket te volgen. Je vindt de code op de verzendbevestiging of het niet-thuiskaartje."
+            }
+          },
+          "delivered": {
+            "name": "Bezorgde pakketten",
+            "data": {
+              "delivered_filter_type": "Filteren op",
+              "delivered_filter_amount": "Aantal"
+            },
+            "data_description": {
+              "delivered_filter_type": "Toon bezorgde pakketten van de laatste X dagen, of beperk tot de X meest recente.",
+              "delivered_filter_amount": "Aantal dagen of pakketten om te tonen."
+            }
+          },
+          "history": {
+            "name": "Pakketgeschiedenis",
+            "data": {
+              "include_history": "Statusgeschiedenis toevoegen"
+            },
+            "data_description": {
+              "include_history": "Voegt per pakket een geschiedenisattribuut toe met elke statusupdate (tijdstip, status, oorspronkelijke tekst). Standaard uit."
+            }
+          }
+        }
+      },
+      "parcels": {
+        "title": "Pakketten beheren",
+        "data": {
+          "tracking_codes": "Trackingcodes"
+        }
+      },
+      "settings": {
+        "title": "Instellingen",
+        "data": {
+          "delivered_filter_type": "Bezorgde pakketten: filteren op",
+          "delivered_filter_amount": "Bezorgde pakketten: aantal",
+          "include_history": "Statusgeschiedenis toevoegen"
+        }
+      }
+    },
+    "error": {
+      "invalid_tracking_code": "Dit lijkt geen Airmee-trackingcode.",
+      "already_tracked": "Dit pakket wordt al gevolgd."
+    }
+  },
+  "selector": {
+    "delivered_filter_type": {
+      "options": {
+        "days": "Dagen",
+        "parcels": "Aantal pakketten"
+      }
+    }
+  },
+  "services": {
+    "track_parcel": {
+      "name": "Pakket volgen",
+      "description": "Begin met het volgen van een Airmee-pakket via de trackingcode.",
+      "fields": {
+        "tracking_code": {
+          "name": "Trackingcode",
+          "description": "De Airmee-trackingcode."
+        }
+      }
+    },
+    "untrack_parcel": {
+      "name": "Pakket niet meer volgen",
+      "description": "Stop met het volgen van een Airmee-pakket via de trackingcode.",
+      "fields": {
+        "tracking_code": {
+          "name": "Trackingcode",
+          "description": "De Airmee-trackingcode om niet meer te volgen."
+        }
+      }
+    }
+  },
+  "device_automation": {
+    "trigger_type": {
+      "parcel_registered": "Een pakket is geregistreerd",
+      "parcel_status_changed": "De status van een pakket is gewijzigd",
+      "parcel_delivered": "Een pakket is bezorgd",
+      "parcel_delivery_time_changed": "De verwachte bezorgtijd van een pakket is gewijzigd"
+    }
+  },
+  "entity": {
+    "button": {
+      "refresh": {
+        "name": "Verversen"
+      }
+    },
+    "calendar": {
+      "deliveries": {
+        "name": "Bezorgingen"
+      }
+    },
+    "sensor": {
+      "incoming_parcels": {
+        "name": "Inkomende pakketten",
+        "unit_of_measurement": "pakketten"
+      },
+      "next_delivery": {
+        "name": "Volgende bezorging"
+      },
+      "en_route_to_pickup_point": {
+        "name": "Onderweg naar afhaalpunt",
+        "unit_of_measurement": "pakketten"
+      },
+      "awaiting_pickup": {
+        "name": "Klaar voor afhalen",
+        "unit_of_measurement": "pakketten"
+      },
+      "delivered_parcels": {
+        "name": "Bezorgde pakketten",
+        "unit_of_measurement": "pakketten"
+      },
+      "last_update": {
+        "name": "Laatste succesvolle update"
+      },
+      "parcel": {
+        "name": "Pakket {barcode}"
+      }
+    }
+  }
+}
