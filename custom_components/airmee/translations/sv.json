@@ -1,0 +1,194 @@
+{
+  "title": "Airmee",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Konfigurera Airmee",
+        "description": "Välj hur du vill följa dina paket.",
+        "menu_options": {
+          "account": "Konto (automatisk import)",
+          "tracking": "Spårningslänkar"
+        }
+      },
+      "account": {
+        "title": "Logga in på Airmee",
+        "description": "Airmee skickar dig en kod via SMS. Ange landskod och telefonnummer precis som i Airmee-appen.",
+        "data": {
+          "country_code": "Landskod",
+          "phone_number": "Telefonnummer"
+        }
+      },
+      "otp": {
+        "title": "Ange koden",
+        "description": "Ange koden som Airmee just skickade via SMS.",
+        "data": {
+          "otp_code": "SMS-kod"
+        }
+      },
+      "tracking": {
+        "title": "Spåra via länk",
+        "description": "Lägg till paket efteråt via integrationens alternativ eller tjänsten `airmee.track_parcel`. Airmee kopplar varje spårningslänk till mottagarens telefonnummerhash, så ange din här.",
+        "data": {
+          "phone_number_hash": "Telefonnummerhash"
+        }
+      },
+      "reconfigure": {
+        "title": "Uppdatera telefonnummerhashen",
+        "description": "Ange mottagarens telefonnummerhash igen.",
+        "data": {
+          "phone_number_hash": "Telefonnummerhash"
+        }
+      }
+    },
+    "error": {
+      "invalid_phone_number": "Airmee godtog inte det telefonnumret.",
+      "invalid_otp": "Koden godtogs inte.",
+      "invalid_phone_number_hash": "Ange telefonnummerhashen.",
+      "cannot_connect": "Det går inte att nå Airmee."
+    },
+    "abort": {
+      "already_configured": "Den här Airmee-källan är redan konfigurerad.",
+      "wrong_account": "Det är ett annat Airmee-konto än det som autentiseras igen.",
+      "reauth_successful": "Autentiseringen gjordes om.",
+      "reconfigure_successful": "Inställningarna uppdaterades."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Airmee-alternativ",
+        "menu_options": {
+          "parcels": "Paket",
+          "settings": "Inställningar"
+        },
+        "sections": {
+          "parcels": {
+            "name": "Paket",
+            "data": {
+              "add": "Lägg till ett paket",
+              "remove": "Ta bort paket"
+            },
+            "data_description": {
+              "add": "Ange en Airmee-spårningskod för att börja spåra den. Du hittar den på leveransbekräftelsen eller på aviseringskortet."
+            }
+          },
+          "delivered": {
+            "name": "Levererade paket",
+            "data": {
+              "delivered_filter_type": "Filtrera efter",
+              "delivered_filter_amount": "Antal"
+            },
+            "data_description": {
+              "delivered_filter_type": "Visa levererade paket från de senaste X dagarna, eller begränsa till de X senaste.",
+              "delivered_filter_amount": "Antal dagar eller paket att visa."
+            }
+          },
+          "history": {
+            "name": "Pakethistorik",
+            "data": {
+              "include_history": "Inkludera statushistorik"
+            },
+            "data_description": {
+              "include_history": "Lägg till ett historikattribut per paket som listar varje statusuppdatering (tidsstämpel, status, originaltext). Avstängt som standard."
+            }
+          }
+        }
+      },
+      "parcels": {
+        "title": "Hantera paket",
+        "data": {
+          "tracking_codes": "Spårningskoder"
+        }
+      },
+      "settings": {
+        "title": "Inställningar",
+        "data": {
+          "delivered_filter_type": "Levererade paket: filtrera efter",
+          "delivered_filter_amount": "Levererade paket: antal",
+          "include_history": "Inkludera statushistorik"
+        }
+      }
+    },
+    "error": {
+      "invalid_tracking_code": "Det ser inte ut som en Airmee-spårningskod.",
+      "already_tracked": "Det paketet spåras redan."
+    }
+  },
+  "selector": {
+    "delivered_filter_type": {
+      "options": {
+        "days": "Dagar",
+        "parcels": "Antal paket"
+      }
+    }
+  },
+  "services": {
+    "track_parcel": {
+      "name": "Spåra paket",
+      "description": "Börja spåra ett paket med dess Airmee-spårningskod.",
+      "fields": {
+        "tracking_code": {
+          "name": "Spårningskod",
+          "description": "Airmee-spårningskoden."
+        }
+      }
+    },
+    "untrack_parcel": {
+      "name": "Sluta spåra paket",
+      "description": "Sluta spåra ett paket med dess Airmee-spårningskod.",
+      "fields": {
+        "tracking_code": {
+          "name": "Spårningskod",
+          "description": "Airmee-spårningskoden att sluta spåra."
+        }
+      }
+    }
+  },
+  "device_automation": {
+    "trigger_type": {
+      "parcel_registered": "Ett paket registrerades",
+      "parcel_status_changed": "Ett pakets status ändrades",
+      "parcel_delivered": "Ett paket levererades",
+      "parcel_delivery_time_changed": "Ett pakets förväntade leveranstid ändrades"
+    }
+  },
+  "entity": {
+    "button": {
+      "refresh": {
+        "name": "Uppdatera"
+      }
+    },
+    "calendar": {
+      "deliveries": {
+        "name": "Leveranser"
+      }
+    },
+    "sensor": {
+      "incoming_parcels": {
+        "name": "Inkommande paket",
+        "unit_of_measurement": "paket"
+      },
+      "next_delivery": {
+        "name": "Nästa leverans"
+      },
+      "en_route_to_pickup_point": {
+        "name": "På väg till utlämningsställe",
+        "unit_of_measurement": "paket"
+      },
+      "awaiting_pickup": {
+        "name": "Redo för upphämtning",
+        "unit_of_measurement": "paket"
+      },
+      "delivered_parcels": {
+        "name": "Levererade paket",
+        "unit_of_measurement": "paket"
+      },
+      "last_update": {
+        "name": "Senaste lyckade uppdatering"
+      },
+      "parcel": {
+        "name": "Paket {barcode}"
+      }
+    }
+  }
+}
