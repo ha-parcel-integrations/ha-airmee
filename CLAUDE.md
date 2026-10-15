@@ -52,7 +52,9 @@ vocabulary. This section is integration-level decisions only.
 **Pre-release, built blind (pre-1.0).** `payload: reconstructed`: the order
 object and the closed `CourierStatus` enum come from the Airmee app's data
 model, not from a captured parcel. Every guess has a one-shot WARNING net
-(unmapped status, schema drift, unreadable time). One consented real parcel
+(unmapped status, schema drift, unreadable time, and — while
+`STATUS_MAP_VALIDATED` is `False` — each mapped value the first time it is
+seen, since the whole map is read off the app rather than a parcel). One consented real parcel
 settles what is still assumed — the checklist is below. Do not move to 1.0.0
 before that.
 

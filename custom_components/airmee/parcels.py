@@ -84,9 +84,33 @@ PLANNED_TIMES_VALIDATED = False
 _EPOCH_MIN = 1_420_070_400
 _EPOCH_MAX = 4_102_444_800
 
+# The enum map is read off the app's own status list, not off a parcel anyone
+# has tracked, so every mapping is a guess. Flip this to ``True`` once a real
+# parcel has walked the stages, and the confirmation warnings stop.
+STATUS_MAP_VALIDATED = False
+
 # Status codes we have already warned about, so each unmapped one is logged
 # only once per HA session instead of on every poll.
 _unmapped_statuses_logged: set[str] = set()
+_unconfirmed_mappings_logged: set[str] = set()
+
+
+def _warn_unconfirmed_mapping(code: str, mapped: ParcelStatus) -> None:
+    """Ask the user to confirm a mapping we have never seen on a parcel."""
+    if STATUS_MAP_VALIDATED:
+        return
+    key = code.strip().casefold()
+    if key in _unconfirmed_mappings_logged:
+        return
+    _unconfirmed_mappings_logged.add(key)
+    _LOGGER.warning(
+        "Airmee reported '%s', which this integration reads as '%s'. That "
+        "mapping comes from the app's own status list, not from a parcel "
+        "anyone has tracked — please confirm it looks right: %s",
+        code.strip(),
+        mapped,
+        NEW_ISSUE_URL,
+    )
 
 
 def _warn_unmapped_status(code: str) -> None:
@@ -124,6 +148,7 @@ def map_parcel_status(code: str | None) -> ParcelStatus:
         return ParcelStatus.UNKNOWN
     mapped = _lookup(code)
     if mapped is not None:
+        _warn_unconfirmed_mapping(str(code), mapped)
         return mapped
     _warn_unmapped_status(code)
     return ParcelStatus.UNKNOWN
@@ -142,6 +167,7 @@ def map_event_status(code: str | None) -> ParcelStatus | None:
         return None
     mapped = _lookup(code)
     if mapped is not None:
+        _warn_unconfirmed_mapping(str(code), mapped)
         return mapped
     _warn_unmapped_status(code)
     return None

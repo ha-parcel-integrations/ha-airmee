@@ -319,6 +319,21 @@ def test_unknown_enum_value_is_unknown_not_delivered():
     assert parcel["delivered"] is False
 
 
+def test_mapped_but_unconfirmed_status_warns_once(caplog):
+    with caplog.at_level("WARNING"):
+        assert map_parcel_status("PICKUP_CONFIRMED") is ParcelStatus.IN_TRANSIT
+        assert map_parcel_status("pickup_confirmed") is ParcelStatus.IN_TRANSIT
+    assert caplog.text.count("please confirm it looks right") == 1
+    assert "issues/new?template=unrecognised_status.yml" in caplog.text
+
+
+def test_confirmation_warnings_stop_once_the_map_is_validated(caplog, monkeypatch):
+    monkeypatch.setattr(parcels_module, "STATUS_MAP_VALIDATED", True)
+    with caplog.at_level("WARNING"):
+        assert map_parcel_status("ASSIGNED") is ParcelStatus.IN_TRANSIT
+    assert "please confirm" not in caplog.text
+
+
 def test_unknown_enum_falls_back_to_the_newest_mapped_event(caplog):
     raw = {
         "new_timeline": [
