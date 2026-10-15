@@ -49,7 +49,7 @@ you act in one of these areas:
 repo)** — endpoints, parameters, the response object and the status
 vocabulary. This section is integration-level decisions only.
 
-**Pre-release, built blind (0.9.0).** `payload: reconstructed`: the order
+**Pre-release, built blind (pre-1.0).** `payload: reconstructed`: the order
 object and the closed `CourierStatus` enum come from the Airmee app's data
 model, not from a captured parcel. Every guess has a one-shot WARNING net
 (unmapped status, schema drift, unreadable time). One consented real parcel
