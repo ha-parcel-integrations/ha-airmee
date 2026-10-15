@@ -56,8 +56,12 @@ _STATUS_MAP: dict[str, ParcelStatus] = {
     "POSTPONED_UNREACHABLE_CUSTOMER": ParcelStatus.PROBLEM,
     "POSTPONED_OTHER": ParcelStatus.PROBLEM,
     "CANCELLED": ParcelStatus.PROBLEM,
-    "EDIT": ParcelStatus.UNKNOWN,
 }
+
+# ``EDIT`` records that the order was amended, so it says nothing about where
+# the parcel is. It must not become the parcel's status, and it must not warn
+# either — it is a known value, just not a stage.
+_NON_STATUS_CODES = frozenset({"EDIT"})
 
 # Fallback for when the tracker omits the raw enum and only sends the localised
 # ``courier_status_formatted`` text. Only unambiguous strings are mapped.
@@ -116,6 +120,8 @@ def map_parcel_status(code: str | None) -> ParcelStatus:
     """
     if not code:
         return ParcelStatus.UNKNOWN
+    if str(code).strip().upper() in _NON_STATUS_CODES:
+        return ParcelStatus.UNKNOWN
     mapped = _lookup(code)
     if mapped is not None:
         return mapped
@@ -131,6 +137,8 @@ def map_event_status(code: str | None) -> ParcelStatus | None:
     and warn once, reusing the parcel-status one-shot set.
     """
     if not code:
+        return None
+    if str(code).strip().upper() in _NON_STATUS_CODES:
         return None
     mapped = _lookup(code)
     if mapped is not None:
@@ -233,11 +241,35 @@ def _order_reference(raw: dict) -> str | None:
     return None
 
 
+def _status_from_history(raw: dict) -> ParcelStatus | None:
+    """Return the newest earlier timeline event that does map, else ``None``.
+
+    A parcel whose newest event carries a word we have never seen is almost
+    never a parcel in an unknown state — its previous events still say where
+    it is.
+    """
+    timeline = raw.get("new_timeline")
+    if not isinstance(timeline, list):
+        return None
+    for event in reversed(timeline[:-1]):
+        if not isinstance(event, dict):
+            continue
+        code = event.get("courier_status")
+        if not code or str(code).strip().upper() in _NON_STATUS_CODES:
+            continue
+        mapped = _lookup(str(code))
+        if mapped is not None and mapped is not ParcelStatus.UNKNOWN:
+            return mapped
+    return None
+
+
 def _current_status(raw: dict) -> tuple[str | None, ParcelStatus]:
     """Return ``(raw_status, status)`` from the newest timeline event.
 
     The raw ``courier_status`` enum is the source of record; the formatted
-    display text only stands in when the enum is absent.
+    display text only stands in when the enum is absent. An unmapped newest
+    event falls back to the newest earlier event that does map, and only then
+    to ``unknown`` — the warning fires either way.
     """
     global _schema_drift_logged
     timeline = raw.get("new_timeline")
@@ -254,7 +286,10 @@ def _current_status(raw: dict) -> tuple[str | None, ParcelStatus]:
             NEW_ISSUE_URL,
             sorted(raw),
         )
-    return raw_status, map_parcel_status(raw_status)
+    status = map_parcel_status(raw_status)
+    if status is ParcelStatus.UNKNOWN:
+        status = _status_from_history(raw) or ParcelStatus.UNKNOWN
+    return raw_status, status
 
 
 def normalize_parcel(

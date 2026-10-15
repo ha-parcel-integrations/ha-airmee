@@ -109,7 +109,10 @@ shapes are reported by `_warn_shape`, which logs the call and the top-level
 **Status: enum first, text as fallback.** The status is
 `new_timeline[-1].courier_status`; `courier_status_formatted` is mapped only
 when the raw enum is absent, and only for unambiguous strings. An unmapped
-value is `unknown` plus a one-shot WARNING — never `delivered`. Delivered is
+value falls back to the newest earlier timeline event that does map, and only
+then to `unknown` — never `delivered`; the one-shot WARNING fires either way.
+`EDIT` is in `_NON_STATUS_CODES`, not the status map: it records that the order
+was amended, so it never becomes the status and never warns. Delivered is
 exactly the two `*DROPOFF_CONFIRMED` values. `returning` is unused.
 
 **`None` on purpose** (`CAPABILITIES_BY_VARIANT`: Tracking = `url`, `history`;

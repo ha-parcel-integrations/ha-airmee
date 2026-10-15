@@ -319,6 +319,43 @@ def test_unknown_enum_value_is_unknown_not_delivered():
     assert parcel["delivered"] is False
 
 
+def test_unknown_enum_falls_back_to_the_newest_mapped_event(caplog):
+    raw = {
+        "new_timeline": [
+            event("PICKUP_CONFIRMED", EPOCH),
+            event("ON_WAY_TO_DROPOFF", EPOCH + 60),
+            event("TELEPORTED", EPOCH + 120),
+        ]
+    }
+    with caplog.at_level("WARNING"):
+        parcel = normalize_parcel(raw)
+    assert parcel["status"] is ParcelStatus.OUT_FOR_DELIVERY
+    assert parcel["raw_status"] == "TELEPORTED"
+    assert "Unrecognised Airmee status" in caplog.text
+
+
+def test_edit_does_not_mask_the_status_and_does_not_warn(caplog):
+    raw = {
+        "new_timeline": [
+            event("ON_WAY_TO_DROPOFF", EPOCH),
+            event("EDIT", EPOCH + 60),
+        ]
+    }
+    with caplog.at_level("WARNING"):
+        parcel = normalize_parcel(raw)
+    assert parcel["status"] is ParcelStatus.OUT_FOR_DELIVERY
+    assert "Unrecognised" not in caplog.text
+
+
+def test_edit_on_a_history_entry_is_silent():
+    assert map_event_status("EDIT") is None
+
+
+def test_unknown_enum_without_usable_history_stays_unknown():
+    raw = {"new_timeline": [event("EDIT", EPOCH), event("TELEPORTED", EPOCH + 60)]}
+    assert normalize_parcel(raw)["status"] is ParcelStatus.UNKNOWN
+
+
 def test_pickup_flag_follows_the_status():
     raw = {"new_timeline": [event("READY_FOR_CUSTOMER_PICKUP", EPOCH)]}
     parcel = normalize_parcel(raw)
