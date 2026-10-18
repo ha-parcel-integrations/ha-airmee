@@ -50,7 +50,7 @@ Part of the [ha-parcel-integrations](https://ha-parcel-integrations.github.io/) 
 
 ## Requirements
 
-- Home Assistant 2024.12 or newer
+- Home Assistant 2025.12 or newer
 - **Account** mode: the phone number you use with Airmee, able to receive an SMS
 - **Tracking links** mode: the token from an Airmee tracking link, and your
   phone number hash — the value Airmee's tracking page sends alongside your
