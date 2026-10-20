@@ -63,7 +63,11 @@ A custom Home Assistant integration that tracks your [Airmee](https://airmee.com
 
 1. In HACS, choose the three-dot menu → **Custom repositories**.
 2. Add `https://github.com/ha-parcel-integrations/ha-airmee` as an **Integration**.
-3. Install **Airmee** and restart Home Assistant.
+3. Install **Airmee** and restart Home Assistant if HACS asks you to.
+
+Or click the button below to open it directly in HACS:
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=ha-parcel-integrations&repository=ha-airmee&category=integration)
 
 ### Manual
 
@@ -71,7 +75,9 @@ Copy `custom_components/airmee` into your `config/custom_components/` folder and
 
 ## Configuration
 
-Add the integration via **Settings → Devices & Services → Add Integration → Airmee** and choose a source. You can add both.
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=airmee)
+
+Or set it up by hand: add the integration via **Settings → Devices & Services → Add Integration → Airmee** and choose a source. You can add both.
 
 **Account.** Enter your country code and phone number, then the code Airmee texts you. Only the resulting login tokens are stored — never your phone number. If Airmee later rejects the login, Home Assistant asks you to repeat the SMS step (use the same phone number). Account mode has no parcel list to manage: parcels come and go with your Airmee inbox.
 
