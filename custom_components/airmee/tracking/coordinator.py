@@ -3,6 +3,7 @@
 Each tracking-link token the user entered is fetched individually and merged
 into one list; the shared publishing lives in :mod:`..coordinator`.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -148,7 +149,9 @@ class AirmeeCoordinator(AirmeeBaseCoordinator):
         # Rebuilt fresh from this cycle's data — a code whose payload just
         # flipped to delivered is skipped starting next cycle; one that
         # somehow un-delivers rejoins the fetch list automatically.
-        self._delivered_codes = {code for code, parcel in entries if parcel["delivered"]}
+        self._delivered_codes = {
+            code for code, parcel in entries if parcel["delivered"]
+        }
 
         return self._publish(
             [parcel for _, parcel in entries],

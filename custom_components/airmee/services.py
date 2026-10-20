@@ -4,6 +4,7 @@
 tracked parcel without opening the integration options — so a Lovelace button
 can start tracking a parcel straight from a dashboard.
 """
+
 from __future__ import annotations
 
 import voluptuous as vol

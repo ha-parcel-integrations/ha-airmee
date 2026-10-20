@@ -1,4 +1,5 @@
 """Tests for the pure parcel-mapping helpers (no Home Assistant instance)."""
+
 from datetime import datetime, timedelta, timezone
 
 import pytest

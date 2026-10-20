@@ -1,4 +1,5 @@
 """Tests for Airmee device triggers."""
+
 from unittest.mock import AsyncMock
 
 from custom_components.airmee.const import DOMAIN

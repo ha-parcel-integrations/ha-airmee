@@ -1,4 +1,5 @@
 """Tests for the account inbox coordinator and account-entry setup."""
+
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -36,7 +37,10 @@ def _entry() -> MockConfigEntry:
             CONF_ACCESS_TOKEN: "acc",
             CONF_REFRESH_TOKEN: "ref",
         },
-        options={CONF_DELIVERED_FILTER_TYPE: "parcels", CONF_DELIVERED_FILTER_AMOUNT: 50},
+        options={
+            CONF_DELIVERED_FILTER_TYPE: "parcels",
+            CONF_DELIVERED_FILTER_AMOUNT: 50,
+        },
     )
 
 
@@ -129,7 +133,9 @@ async def test_other_errors_are_update_failures(hass):
     entry = _entry()
     entry.add_to_hass(hass)
     client = AsyncMock()
-    client.async_get_deliveries.side_effect = AirmeeAccountError("HTTP 503", status_code=503)
+    client.async_get_deliveries.side_effect = AirmeeAccountError(
+        "HTTP 503", status_code=503
+    )
     with pytest.raises(UpdateFailed):
         await AirmeeAccountCoordinator(hass, client, entry)._async_update_data()
 
@@ -182,7 +188,9 @@ async def test_account_entry_sets_up_without_services_and_persists_rotated_token
 
         # A token rotation inside the client is written back to the entry.
         client = entry.runtime_data.client
-        await client._token_callback({"access_token": "n-acc", "refresh_token": "n-ref"})
+        await client._token_callback(
+            {"access_token": "n-acc", "refresh_token": "n-ref"}
+        )
         assert entry.data[CONF_ACCESS_TOKEN] == "n-acc"
         assert entry.data[CONF_REFRESH_TOKEN] == "n-ref"
         assert entry.data[CONF_SOURCE] == SOURCE_ACCOUNT

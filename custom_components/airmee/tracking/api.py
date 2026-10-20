@@ -1,4 +1,5 @@
 """Airmee consumer tracking API client."""
+
 from __future__ import annotations
 
 import logging
@@ -49,9 +50,7 @@ class AirmeeApiClient:
     paired with the wrong hash) is an empty list.
     """
 
-    def __init__(
-        self, session: aiohttp.ClientSession, phone_number_hash: str
-    ) -> None:
+    def __init__(self, session: aiohttp.ClientSession, phone_number_hash: str) -> None:
         """Initialise the client with an aiohttp session and the recipient hash."""
         self._session = session
         self._phone_number_hash = phone_number_hash
@@ -76,10 +75,14 @@ class AirmeeApiClient:
             if response.status == 429:
                 retry_after_header = response.headers.get("Retry-After")
                 try:
-                    retry_after = float(retry_after_header) if retry_after_header else None
+                    retry_after = (
+                        float(retry_after_header) if retry_after_header else None
+                    )
                 except ValueError:
                     retry_after = None  # an HTTP-date, not seconds; the caller's own backoff applies
-                raise AirmeeApiError("HTTP 429", status_code=429, retry_after=retry_after)
+                raise AirmeeApiError(
+                    "HTTP 429", status_code=429, retry_after=retry_after
+                )
             if response.status != 200:
                 raise AirmeeApiError(
                     f"HTTP {response.status}", status_code=response.status

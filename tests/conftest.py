@@ -1,4 +1,5 @@
 """pytest configuration for the Airmee test suite."""
+
 import sys
 
 import pytest

@@ -1,4 +1,5 @@
 """Tests for the Airmee account client: OTP login, auth header, token rotation."""
+
 import asyncio
 import json
 from unittest.mock import AsyncMock, MagicMock
@@ -117,7 +118,9 @@ async def test_pre_login_server_error_and_bad_bodies():
 
 
 async def test_errors_never_contain_the_secret_inputs():
-    session = _session(post=[_response(400, {"message": "bad otp 999999 for 700000000"})])
+    session = _session(
+        post=[_response(400, {"message": "bad otp 999999 for 700000000"})]
+    )
     with pytest.raises(AirmeeAccountOtpError) as err:
         await async_verify_otp(
             session,
@@ -270,7 +273,9 @@ async def test_concurrent_401s_share_one_refresh():
 
     async def slow_post_enter():
         await release.wait()
-        return _response(200, {"access_token": "acc-1", "refresh_token": "ref-1"}).__aenter__.return_value
+        return _response(
+            200, {"access_token": "acc-1", "refresh_token": "ref-1"}
+        ).__aenter__.return_value
 
     refresh_ctx = MagicMock()
     refresh_ctx.__aenter__ = AsyncMock(side_effect=slow_post_enter)

@@ -3,6 +3,7 @@
 Built from the app's order model, not from a captured parcel: every value is
 made up. Epoch values are Unix seconds.
 """
+
 from __future__ import annotations
 
 ACTIVE_CODE = "tok-active"

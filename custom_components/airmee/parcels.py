@@ -9,6 +9,7 @@ trivially unit-testable without spinning up HA.
 The carrier-specific parts are :data:`_STATUS_MAP`, :data:`_FORMATTED_STATUS_MAP`
 and :func:`normalize_parcel`; the rest is suite-wide machinery.
 """
+
 from __future__ import annotations
 
 import logging
@@ -351,7 +352,11 @@ def normalize_parcel(
         )
         if planned_from is None:
             planned_from = to_iso_timestamp(raw.get("dropoff_eta"), "dropoff_eta")
-        if planned_from and planned_to and parse_iso(planned_to) == parse_iso(planned_from):
+        if (
+            planned_from
+            and planned_to
+            and parse_iso(planned_to) == parse_iso(planned_from)
+        ):
             planned_to = None
 
     return {
@@ -406,9 +411,7 @@ def apply_delivered_filter(parcels: list[dict], entry: ConfigEntry) -> list[dict
     shows.
     """
     options = entry.options
-    filter_type = options.get(
-        CONF_DELIVERED_FILTER_TYPE, DEFAULT_DELIVERED_FILTER_TYPE
-    )
+    filter_type = options.get(CONF_DELIVERED_FILTER_TYPE, DEFAULT_DELIVERED_FILTER_TYPE)
     amount = int(
         options.get(CONF_DELIVERED_FILTER_AMOUNT, DEFAULT_DELIVERED_FILTER_AMOUNT)
     )

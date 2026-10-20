@@ -1,4 +1,5 @@
 """Tests for Airmee diagnostics."""
+
 from datetime import timedelta
 from unittest.mock import MagicMock
 
@@ -46,14 +47,19 @@ def test_redact_keeps_every_key_and_replaces_sensitive_values():
     assert result["courier_status_formatted"] == "Out for delivery"
     assert result["dropoff_latest_time"] == raw["dropoff_latest_time"]
     assert result["new_timeline"][0]["courier_status"] == "REGISTERED"
-    assert result["new_timeline"][0]["time_of_event"] == raw["new_timeline"][0][
-        "time_of_event"
-    ]
+    assert (
+        result["new_timeline"][0]["time_of_event"]
+        == raw["new_timeline"][0]["time_of_event"]
+    )
 
 
 def test_redact_walks_lists_and_nested_dicts():
-    result = redact({"parcels": [{"tracking_code": "tok", "n": {"city": "X", "ok": 1}}]})
-    assert result == {"parcels": [{"tracking_code": REDACTED, "n": {"city": REDACTED, "ok": 1}}]}
+    result = redact(
+        {"parcels": [{"tracking_code": "tok", "n": {"city": "X", "ok": 1}}]}
+    )
+    assert result == {
+        "parcels": [{"tracking_code": REDACTED, "n": {"city": REDACTED, "ok": 1}}]
+    }
 
 
 def _entry(data: dict) -> MagicMock:

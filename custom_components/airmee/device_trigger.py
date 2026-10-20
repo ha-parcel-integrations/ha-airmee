@@ -4,6 +4,7 @@ Surfaces the parcel events the coordinator fires on the HA event bus as
 no-code automation triggers. Each trigger filters on the hub's ``device_id``
 (attached to every event).
 """
+
 from __future__ import annotations
 
 import voluptuous as vol

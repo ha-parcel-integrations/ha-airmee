@@ -5,6 +5,7 @@ header carries the raw token with no ``Bearer`` prefix; the pre-login and
 refresh calls send the literal ``TEMP_TOKEN``. No token, OTP code or phone
 number is ever written to a log or an exception message.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -84,9 +85,7 @@ async def _json(response: aiohttp.ClientResponse, context: str) -> Any:
         # content_type=None: the backend is not strict about its JSON type.
         return await response.json(content_type=None)
     except ValueError as err:
-        _warn_shape(
-            f"{context}:body", f"HTTP {response.status} body was not JSON"
-        )
+        _warn_shape(f"{context}:body", f"HTTP {response.status} body was not JSON")
         raise AirmeeAccountError("unparseable body") from err
 
 

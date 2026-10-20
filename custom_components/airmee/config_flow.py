@@ -208,9 +208,7 @@ class AirmeeConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="reconfigure", data_schema=_HASH_SCHEMA, errors=errors
         )
 
-    async def async_step_reauth(
-        self, entry_data: dict[str, Any]
-    ) -> ConfigFlowResult:
+    async def async_step_reauth(self, entry_data: dict[str, Any]) -> ConfigFlowResult:
         """Start re-authentication after Airmee rejected the stored credentials."""
         return await self.async_step_reconfigure()
 

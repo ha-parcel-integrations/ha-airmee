@@ -4,6 +4,7 @@ Pure-function tests for the tiering/scheduling helpers, plus a few
 integration checks that ``_async_update_data`` actually wires them up (the
 full-stop condition, its resume, and the 429 backoff).
 """
+
 from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock
 
@@ -184,7 +185,8 @@ async def test_update_interval_resumes_once_a_parcel_is_added(hass):
     assert coordinator.update_interval is None
 
     hass.config_entries.async_update_entry(
-        entry, options={**entry.options, CONF_PARCELS: [{CONF_TRACKING_CODE: ACTIVE_CODE}]}
+        entry,
+        options={**entry.options, CONF_PARCELS: [{CONF_TRACKING_CODE: ACTIVE_CODE}]},
     )
     client.async_get_parcel.return_value = active_sample()
     await coordinator._async_update_data()
@@ -228,7 +230,10 @@ async def test_429_backoff_grows_without_a_retry_after_header(hass):
 
 def test_unparseable_planned_from_counts_as_hot():
     parcels = [_out_for_delivery("not-a-date")]
-    assert _hottest_tier_minutes(parcels, datetime(2026, 4, 29, 10, tzinfo=UTC)) == HOT_INTERVAL_MINUTES
+    assert (
+        _hottest_tier_minutes(parcels, datetime(2026, 4, 29, 10, tzinfo=UTC))
+        == HOT_INTERVAL_MINUTES
+    )
 
 
 async def test_device_id_is_cached_and_parcels_without_barcode_are_ignored(hass):

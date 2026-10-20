@@ -1,4 +1,5 @@
 """Tests for the Airmee tracking API client."""
+
 import json
 from unittest.mock import AsyncMock, MagicMock
 
@@ -75,9 +76,7 @@ async def test_server_error_is_not_an_auth_error():
 
 
 async def test_429_carries_numeric_retry_after():
-    client = AirmeeApiClient(
-        _session_returning(429, {}, {"Retry-After": "120"}), HASH
-    )
+    client = AirmeeApiClient(_session_returning(429, {}, {"Retry-After": "120"}), HASH)
     with pytest.raises(AirmeeApiError) as err:
         await client.async_get_parcel(CODE)
     assert err.value.status_code == 429

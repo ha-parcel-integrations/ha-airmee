@@ -1,4 +1,5 @@
 """Airmee parcel tracker custom component for Home Assistant."""
+
 from __future__ import annotations
 
 import logging
@@ -98,9 +99,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: AirmeeConfigEntry) -> bo
     return True
 
 
-async def _async_options_updated(
-    hass: HomeAssistant, entry: AirmeeConfigEntry
-) -> None:
+async def _async_options_updated(hass: HomeAssistant, entry: AirmeeConfigEntry) -> None:
     """Apply changed options by refreshing the coordinator."""
     await entry.runtime_data.coordinator.async_request_refresh()
 

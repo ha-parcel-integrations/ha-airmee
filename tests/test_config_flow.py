@@ -1,4 +1,5 @@
 """Tests for the Airmee config and options flow."""
+
 from unittest.mock import AsyncMock, patch
 
 import aiohttp

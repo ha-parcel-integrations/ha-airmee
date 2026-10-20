@@ -1,4 +1,5 @@
 """Calendar platform for the Airmee parcel tracker integration."""
+
 from __future__ import annotations
 
 from datetime import datetime, timedelta
@@ -20,17 +21,20 @@ PARALLEL_UPDATES = 0
 _DEFAULT_EVENT_DURATION = timedelta(hours=1)
 
 
-
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: AirmeeConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the Airmee deliveries calendar from a config entry."""
-    async_add_entities([AirmeeDeliveriesCalendar(entry.runtime_data.coordinator, entry)])
+    async_add_entities(
+        [AirmeeDeliveriesCalendar(entry.runtime_data.coordinator, entry)]
+    )
 
 
-class AirmeeDeliveriesCalendar(CoordinatorEntity[AirmeeBaseCoordinator], CalendarEntity):
+class AirmeeDeliveriesCalendar(
+    CoordinatorEntity[AirmeeBaseCoordinator], CalendarEntity
+):
     """A read-only calendar of expected Airmee deliveries.
 
     Each active tracked parcel with a known delivery moment becomes an event.

@@ -1,4 +1,5 @@
 """Coordinator for the account inbox source."""
+
 from __future__ import annotations
 
 import logging
@@ -61,8 +62,7 @@ class AirmeeAccountCoordinator(AirmeeBaseCoordinator):
 
         include_history = self._include_history
         parcels = [
-            normalize_parcel(order, include_history=include_history)
-            for order in orders
+            normalize_parcel(order, include_history=include_history) for order in orders
         ]
         # An order without any usable id has no stable key for events or its
         # sensor, so it is skipped rather than published under a guess.
