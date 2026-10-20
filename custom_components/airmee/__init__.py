@@ -59,21 +59,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: AirmeeConfigEntry) -> bo
                 },
             )
 
-        client = AirmeeAccountClient(
+        account_client = AirmeeAccountClient(
             async_get_clientsession(hass),
             access_token=entry.data[CONF_ACCESS_TOKEN],
             refresh_token=entry.data[CONF_REFRESH_TOKEN],
             token_callback=async_store_tokens,
         )
+        client: AirmeeApiClient | AirmeeAccountClient = account_client
         coordinator: AirmeeCoordinator | AirmeeAccountCoordinator = (
-            AirmeeAccountCoordinator(hass, client, entry)
+            AirmeeAccountCoordinator(hass, account_client, entry)
         )
     else:
         # The recipient's hash rides along on every tracking request.
-        client = AirmeeApiClient(
+        tracking_client = AirmeeApiClient(
             async_get_clientsession(hass), entry.data[CONF_PHONE_NUMBER_HASH]
         )
-        coordinator = AirmeeCoordinator(hass, client, entry)
+        client = tracking_client
+        coordinator = AirmeeCoordinator(hass, tracking_client, entry)
 
     # Fetch initial data here, before forwarding to platforms. Raising
     # ConfigEntryNotReady from a forwarded platform is too late for HA to catch

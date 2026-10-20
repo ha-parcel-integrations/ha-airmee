@@ -123,6 +123,8 @@ class AirmeeBaseCoordinator(DataUpdateCoordinator[list[dict]]):
     ``self.delivered`` the rest.
     """
 
+    config_entry: ConfigEntry
+
     def __init__(
         self,
         hass: HomeAssistant,
