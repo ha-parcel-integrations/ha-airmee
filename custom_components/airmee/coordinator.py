@@ -244,6 +244,24 @@ class AirmeeBaseCoordinator(DataUpdateCoordinator[list[dict]]):
         """Return this cycle's polling tier; ``None`` suspends polling."""
         return _hottest_tier_minutes(active, now)
 
+    async def _async_update_data(self) -> list[dict]:
+        try:
+            return await self._async_poll()
+        except Exception:
+            # The base class keeps the last interval after a failure, which
+            # after an overnight poll is the whole quiet window.
+            now = dt_util.now()
+            tier = self._tier_for(self.data or [], now)
+            self.update_interval = _next_update_interval(
+                now,
+                tier if tier is not None else MID_INTERVAL_MINUTES,
+                self.config_entry.entry_id,
+            )
+            raise
+
+    async def _async_poll(self) -> list[dict]:
+        raise NotImplementedError
+
     def _fire_change_events(self, parcels: list[dict]) -> None:
         """Fire registered / status-changed / delivered / delivery-time events.
 

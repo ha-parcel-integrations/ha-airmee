@@ -54,7 +54,7 @@ class AirmeeCoordinator(AirmeeBaseCoordinator):
             if item.get(CONF_TRACKING_CODE)
         ]
 
-    async def _async_update_data(self) -> list[dict]:
+    async def _async_poll(self) -> list[dict]:
         """Fetch every tracked parcel and split into active vs delivered."""
         codes = self._tracked()
 

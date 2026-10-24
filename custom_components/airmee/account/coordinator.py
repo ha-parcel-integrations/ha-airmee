@@ -41,7 +41,7 @@ class AirmeeAccountCoordinator(AirmeeBaseCoordinator):
         """Return a tier every cycle: the inbox is how new parcels are discovered."""
         return _hottest_tier_minutes(active, now) or MID_INTERVAL_MINUTES
 
-    async def _async_update_data(self) -> list[dict]:
+    async def _async_poll(self) -> list[dict]:
         """Fetch the inbox and publish it."""
         try:
             orders = await self._client.async_get_deliveries()
