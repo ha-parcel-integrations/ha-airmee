@@ -132,7 +132,9 @@ Standard HA removal applies: **Settings → Devices & Services → Airmee → �
 | `sensor.airmee_incoming_parcels` | Number of active tracked parcels, full list under the `parcels` attribute |
 | `sensor.airmee_parcel_<code>` | One per tracked parcel; state is the canonical status, attributes carry the full normalised parcel |
 | `sensor.airmee_next_delivery` | Earliest expected delivery moment across all active parcels. Airmee's delivery-window fields are not yet confirmed, so this stays `unknown` until a real parcel settles them (see Pre-release) |
+| `sensor.airmee_awaiting_pickup` | Incoming parcels that are ready to collect at a pickup point |
 | `sensor.airmee_delivered_parcels` | Recently delivered parcels (see the retention option) |
+| `calendar.airmee_deliveries` | Read-only calendar of expected deliveries, no extra API calls |
 | `sensor.airmee_last_successful_update` | Diagnostic: when Airmee was last polled successfully |
 
 A delivered parcel moves from its per-parcel sensor to the delivered sensor automatically.
@@ -198,7 +200,7 @@ logger:
 
 - **A parcel shows `unknown` (tracking links)** — Airmee answered with nothing for that link: the token or the phone number hash is wrong, or the tracker has expired. Check both; a rejected hash starts a re-enter prompt.
 - **Home Assistant asks to log in again (account)** — Airmee rejected the stored login. Repeat the SMS step with the same phone number.
-- **A status logs "Unrecognised Airmee status"** — please [open an issue](https://github.com/ha-parcel-integrations/ha-airmee/issues/new) with the logged line so the mapping can be extended.
+- **A status logs "Unrecognised Airmee status"** — please [open an issue](https://github.com/ha-parcel-integrations/ha-airmee/issues/new?template=unrecognised_status.yml) with the logged line so the mapping can be extended.
 
 ## Related integrations
 
