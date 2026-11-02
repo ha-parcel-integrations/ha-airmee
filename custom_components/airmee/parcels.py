@@ -319,6 +319,9 @@ def _current_status(raw: dict) -> tuple[str | None, ParcelStatus]:
     return raw_status, status
 
 
+_DELIVERY_CODES = frozenset({"pin", "qrcode"})
+
+
 def normalize_parcel(
     raw: dict, *, tracking_code: str | None = None, include_history: bool = False
 ) -> dict:
@@ -327,8 +330,9 @@ def normalize_parcel(
     ``tracking_code`` is the user's tracking-link token; it stands in as the
     barcode because no stable order reference has been confirmed on that route.
     The account inbox has no token, so it uses the order's ``id``.
-    ``raw`` is the whole order record, untrimmed — redaction is a diagnostics
-    concern. ``receiver``, ``weight``, ``dimensions`` and ``pickup_point`` are
+    ``raw`` is the order record without its delivery PIN and QR code: it ends up
+    in sensor attributes and recorder-stored events, and those codes claim the
+    parcel, so they never leave this function. ``receiver``, ``weight``, ``dimensions`` and ``pickup_point`` are
     ``None`` until a populated response establishes their shape.
     """
     raw_status, status = _current_status(raw)
@@ -376,7 +380,7 @@ def normalize_parcel(
         "weight": None,
         "dimensions": None,
         "history": build_history(timeline) if include_history else None,
-        "raw": raw,
+        "raw": {key: value for key, value in raw.items() if key not in _DELIVERY_CODES},
     }
 
 

@@ -12,8 +12,7 @@ from . import AirmeeConfigEntry
 # Diagnostics are pasted into public issues, so redact anything that
 # identifies a person, an address, a parcel or a credential. Over-redacting is
 # cheap; under-redacting leaks a user's home address into a GitHub thread.
-# Keys are kept; only values are replaced. ``raw`` itself is never trimmed —
-# this is the only place privacy is applied.
+# Keys are kept; only values are replaced.
 TO_REDACT = {
     # canonical fields we publish ourselves
     "tracking_code",

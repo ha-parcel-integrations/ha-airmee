@@ -422,12 +422,14 @@ def test_barcode_is_the_token_else_id_else_receipt_id():
     assert normalize_parcel(raw)["barcode"] is None
 
 
-def test_normalize_keeps_the_full_raw_record_untrimmed():
+def test_raw_carries_the_order_without_the_delivery_codes():
     raw = delivered_sample()
     parcel = normalize_parcel(raw)
-    assert parcel["raw"] is raw
-    assert parcel["raw"]["pin"] == "1234"
+    assert parcel["raw"] == {
+        key: value for key, value in raw.items() if key not in {"pin", "qrcode"}
+    }
     assert parcel["raw"]["receiver_name"] == "Jane Doe"
+    assert raw["pin"] == "1234"
 
 
 # ---------------------------------------------------------------------------

@@ -127,10 +127,12 @@ source. Times are accepted only as Unix seconds in a plausible range.
 **Barcode.** Tracking: the user's token (the record's own `id` is unconfirmed).
 Account: the order's `id`, else `receipt_id`; an order with neither is skipped.
 
-**`raw` is never trimmed.** Privacy lives in `diagnostics.py` only: exact keys
-plus any key containing a sensitive `_`-separated word (name, address, phone,
-lat/lng, token, hash, url, pin, qr…) — keys are kept, values replaced. Do not
-expose courier location, names or addresses in entity attributes.
+**`raw` is the order record minus `pin` and `qrcode`.** Those two claim the
+parcel, so `normalize_parcel` drops them before anything is published. The rest
+stays in `raw`, names and addresses included, so it reaches attributes and
+events. `diagnostics.py` redacts exact keys plus any key containing a sensitive
+`_`-separated word (name, address, phone, lat/lng, token, hash, url, pin, qr…) —
+keys are kept, values replaced.
 
 **Still to confirm with a real parcel:** the raw enum is present on the
 tracking route; the hash boundary; whether `id`/`receipt_id` is stable and
