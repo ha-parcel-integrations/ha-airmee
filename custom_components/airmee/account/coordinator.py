@@ -60,6 +60,7 @@ class AirmeeAccountCoordinator(AirmeeBaseCoordinator):
             raise UpdateFailed(str(err)) from err
         self._consecutive_429 = 0
 
+        self.orders = orders
         include_history = self._include_history
         parcels = [
             normalize_parcel(order, include_history=include_history) for order in orders

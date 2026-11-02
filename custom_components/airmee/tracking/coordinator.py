@@ -136,6 +136,7 @@ class AirmeeCoordinator(AirmeeBaseCoordinator):
         if codes_to_fetch and errors == len(codes_to_fetch) and not raws_by_code:
             raise UpdateFailed("Airmee unreachable for all tracked parcels")
 
+        self.orders = list(raws_by_code.values())
         include_history = self._include_history
         entries = [
             (

@@ -422,13 +422,22 @@ def test_barcode_is_the_token_else_id_else_receipt_id():
     assert normalize_parcel(raw)["barcode"] is None
 
 
-def test_raw_carries_the_order_without_the_delivery_codes():
+def test_raw_only_carries_the_allowlisted_fields():
     raw = delivered_sample()
-    parcel = normalize_parcel(raw)
-    assert parcel["raw"] == {
-        key: value for key, value in raw.items() if key not in {"pin", "qrcode"}
+    raw["courier_lat"] = 59.3
+    raw["door_code"] = "1234"
+    raw["photos_array"] = ["https://example.com/door.jpg"]
+    raw["proxy_personal_number"] = {"proxy_personal_number": "x"}
+    raw["something_new"] = "unknown"
+
+    published = normalize_parcel(raw)["raw"]
+
+    assert set(published) == {
+        "courier_status_formatted",
+        "dropoff_earliest_time",
+        "dropoff_latest_time",
+        "dropoff_eta",
     }
-    assert parcel["raw"]["receiver_name"] == "Jane Doe"
     assert raw["pin"] == "1234"
 
 

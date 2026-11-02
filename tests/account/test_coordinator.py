@@ -57,6 +57,8 @@ async def test_inbox_is_split_into_active_and_delivered(hass):
 
     assert [p["barcode"] for p in data] == ["1"]
     assert [p["barcode"] for p in coordinator.delivered] == ["2"]
+    assert "pin" not in data[0]["raw"]
+    assert [order["pin"] for order in coordinator.orders] == ["1234", "1234"]
     assert data[0]["status"] is ParcelStatus.OUT_FOR_DELIVERY
     assert data[0]["url"] is None
     assert coordinator.delivered_codes == set()

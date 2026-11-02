@@ -36,6 +36,22 @@ TO_REDACT = {
     "qrcode",
     "extra_information",
     "customer_profile",
+    "dropoff_feedback",
+    "return_reason",
+    # getting into the building, and who may collect
+    "door_code",
+    "door_access",
+    "intercom_number",
+    "floor",
+    "type_of_building",
+    "access_via_courtyard",
+    "proxy_personal_number",
+    # where the parcel and the courier are, and photos of the delivery
+    "courier_locations",
+    "photos_array",
+    "locker_box_mark",
+    "locker_location_id",
+    "locker_description",
 }
 
 # Any key containing one of these ``_``-separated words is redacted too, so a
@@ -110,4 +126,5 @@ async def async_get_config_entry_diagnostics(
         },
         "incoming": redact(coordinator.data or []),
         "delivered": redact(coordinator.delivered or []),
+        "orders": redact(coordinator.orders),
     }

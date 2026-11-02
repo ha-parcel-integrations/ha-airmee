@@ -319,7 +319,31 @@ def _current_status(raw: dict) -> tuple[str | None, ParcelStatus]:
     return raw_status, status
 
 
-_DELIVERY_CODES = frozenset({"pin", "qrcode"})
+# ``raw`` ends up in sensor attributes and recorder-stored events, so a field
+# only reaches it from this list. The order also holds names, addresses,
+# coordinates, delivery photos, door and intercom codes, a proxy's personal
+# number and the codes that claim the parcel, and it has never been seen on a
+# real parcel, so an unknown field has to stay out by default. A field earns its
+# place by being about the parcel or its delivery and useful in an automation.
+PUBLISHED_RAW_FIELDS = frozenset(
+    {
+        "courier_status_formatted",
+        "dropoff_earliest_time",
+        "dropoff_latest_time",
+        "dropoff_eta",
+        "product_name",
+        "is_large",
+        "cold_delivery",
+        "can_leave_in_front_of_door",
+        "leave_in_front_of_door",
+        "should_ring",
+    }
+)
+
+
+def published_raw(raw: dict) -> dict:
+    """Return the publishable subset of an order record."""
+    return {key: value for key, value in raw.items() if key in PUBLISHED_RAW_FIELDS}
 
 
 def normalize_parcel(
@@ -330,9 +354,9 @@ def normalize_parcel(
     ``tracking_code`` is the user's tracking-link token; it stands in as the
     barcode because no stable order reference has been confirmed on that route.
     The account inbox has no token, so it uses the order's ``id``.
-    ``raw`` is the order record without its delivery PIN and QR code: it ends up
-    in sensor attributes and recorder-stored events, and those codes claim the
-    parcel, so they never leave this function. ``receiver``, ``weight``, ``dimensions`` and ``pickup_point`` are
+    ``raw`` is :func:`published_raw` of the order; the whole record stays on the
+    coordinator for diagnostics. ``receiver``, ``weight``, ``dimensions`` and
+    ``pickup_point`` are
     ``None`` until a populated response establishes their shape.
     """
     raw_status, status = _current_status(raw)
@@ -380,7 +404,7 @@ def normalize_parcel(
         "weight": None,
         "dimensions": None,
         "history": build_history(timeline) if include_history else None,
-        "raw": {key: value for key, value in raw.items() if key not in _DELIVERY_CODES},
+        "raw": published_raw(raw),
     }
 
 

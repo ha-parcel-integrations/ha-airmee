@@ -146,6 +146,9 @@ class AirmeeBaseCoordinator(DataUpdateCoordinator[list[dict]]):
         )
         self._client = client
         self.delivered: list[dict] = []
+        # The whole order records behind this cycle's parcels, for diagnostics
+        # only: they hold what ``published_raw`` keeps out of state and events.
+        self.orders: list[dict] = []
         # Tracking codes confirmed delivered on a prior refresh — excluded
         # from the fetch this cycle since a delivered parcel's payload can
         # never change again. Only the tracking source uses it; the account

@@ -66,6 +66,8 @@ async def test_update_merges_multiple_parcels(hass):
     assert len(data) == 1  # one active
     assert data[0]["barcode"] == ACTIVE_CODE
     assert len(coordinator.delivered) == 1
+    assert "pin" not in data[0]["raw"]
+    assert [order["pin"] for order in coordinator.orders] == ["1234", "1234"]
     assert coordinator.last_success_time is not None
 
 

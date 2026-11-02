@@ -7,6 +7,7 @@ from custom_components.airmee.diagnostics import (
     async_get_config_entry_diagnostics,
     redact,
 )
+from custom_components.airmee.parcels import published_raw
 
 from .payloads import active_sample
 
@@ -22,6 +23,18 @@ def test_redact_keeps_every_key_and_replaces_sensitive_values():
             "courier_lng": 18.0,
             "receiver_phone": "+46700000000",
             "weird_new_address_line": "x",
+            "door_code": "1234",
+            "door_access": "x",
+            "intercom_number": "x",
+            "floor": "3",
+            "type_of_building": "x",
+            "access_via_courtyard": True,
+            "proxy_personal_number": {"proxy_personal_number": "x"},
+            "courier_locations": ["x"],
+            "photos_array": ["x"],
+            "locker_box_mark": "x",
+            "dropoff_feedback": "x",
+            "return_reason": "x",
         }
     )
     result = redact(raw)
@@ -41,6 +54,18 @@ def test_redact_keeps_every_key_and_replaces_sensitive_values():
         "courier_lng",
         "receiver_phone",
         "weird_new_address_line",
+        "door_code",
+        "door_access",
+        "intercom_number",
+        "floor",
+        "type_of_building",
+        "access_via_courtyard",
+        "proxy_personal_number",
+        "courier_locations",
+        "photos_array",
+        "locker_box_mark",
+        "dropoff_feedback",
+        "return_reason",
     ):
         assert result[key] == REDACTED, key
     # the status vocabulary and the times are what a bug report needs
@@ -75,9 +100,10 @@ def _entry(data: dict) -> MagicMock:
             "receiver": "Jane Doe",
             "url": "https://tracking.airmee.com/track/tok",
             "status": "out_for_delivery",
-            "raw": active_sample(),
+            "raw": published_raw(active_sample()),
         }
     ]
+    entry.runtime_data.coordinator.orders = [active_sample()]
     entry.runtime_data.coordinator.delivered = []
     entry.runtime_data.coordinator.delivered_codes = set()
     return entry
@@ -105,8 +131,10 @@ async def test_diagnostics_redacts_credentials_and_payload_pii(hass):
     assert incoming["barcode"] == REDACTED
     assert incoming["receiver"] == REDACTED
     assert incoming["url"] == REDACTED
-    assert incoming["raw"]["pin"] == REDACTED
-    assert incoming["raw"]["receiver_name"] == REDACTED
+    assert "pin" not in incoming["raw"]
+    assert "receiver_name" not in incoming["raw"]
+    assert result["orders"][0]["pin"] == REDACTED
+    assert result["orders"][0]["receiver_name"] == REDACTED
     assert incoming["status"] == "out_for_delivery"
     assert result["counts"] == {
         "incoming_active": 1,

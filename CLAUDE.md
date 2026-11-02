@@ -127,12 +127,14 @@ source. Times are accepted only as Unix seconds in a plausible range.
 **Barcode.** Tracking: the user's token (the record's own `id` is unconfirmed).
 Account: the order's `id`, else `receipt_id`; an order with neither is skipped.
 
-**`raw` is the order record minus `pin` and `qrcode`.** Those two claim the
-parcel, so `normalize_parcel` drops them before anything is published. The rest
-stays in `raw`, names and addresses included, so it reaches attributes and
-events. `diagnostics.py` redacts exact keys plus any key containing a sensitive
-`_`-separated word (name, address, phone, lat/lng, token, hash, url, pin, qr…) —
-keys are kept, values replaced.
+**`raw` is an allowlist.** `published_raw` passes only `PUBLISHED_RAW_FIELDS`, so
+names, addresses, courier location, `pin`, `qrcode`, door codes and any field not
+seen before stay out of attributes and events. Add a field only if it is
+non-personal, about the parcel or its delivery, and useful in an automation; the
+timeline stays out because `history` covers it. The whole record stays on
+`coordinator.orders` for diagnostics, where `diagnostics.py` redacts exact keys
+plus any key containing a sensitive `_`-separated word (name, address, phone,
+lat/lng, token, hash, url, pin, qr…) — keys are kept, values replaced.
 
 **Still to confirm with a real parcel:** the raw enum is present on the
 tracking route; the hash boundary; whether `id`/`receipt_id` is stable and
