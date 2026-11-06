@@ -28,6 +28,18 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: source
+    attributes:
+      label: Which Airmee setup are you using?
+      description: The source you picked during setup, shown on the integration's entry under Settings → Devices & services → Airmee.
+      options:
+        - Account (automatic import)
+        - Tracking links
+        - Not sure
+    validations:
+      required: true
+
   - type: textarea
     id: what-happened
     attributes:

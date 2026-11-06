@@ -5,6 +5,18 @@ labels: ["enhancement"]
 assignees:
   - peter-mdf
 body:
+  - type: dropdown
+    id: source
+    attributes:
+      label: Which Airmee setup is this about?
+      description: The source you picked during setup, shown on the integration's entry under Settings → Devices & services → Airmee.
+      options:
+        - Account (automatic import)
+        - Tracking links
+        - All of them / not setup-specific
+    validations:
+      required: true
+
   - type: textarea
     id: feature
     attributes:
