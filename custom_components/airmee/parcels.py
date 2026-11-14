@@ -380,6 +380,8 @@ def normalize_parcel(
         if delivered and isinstance(latest, dict)
         else None
     )
+    if delivered and delivered_at is None:
+        delivered_at = to_iso_timestamp(raw.get("dropoff_eta"), "dropoff_eta")
 
     planned_from = planned_to = None
     if PLANNED_TIMES_VALIDATED and not delivered:

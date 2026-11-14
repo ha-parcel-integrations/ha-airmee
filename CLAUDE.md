@@ -132,7 +132,9 @@ shared, so a window that route sends in the same shape is filled too, and any
 other shape stays `None` with the one-shot WARNING (`PLANNED_TIMES_VALIDATED` is
 the switch). `pickup_point`, `receiver`, `weight`, `dimensions` have no
 confirmed source. Times are accepted only as Unix seconds in a plausible range,
-as a number or a string of digits.
+as a number or a string of digits. On a delivered order the account route has
+no timeline, but `dropoff_eta` holds the drop-off moment (matched the Airmee
+app to the minute on four deliveries), so `delivered_at` falls back to it.
 
 **Barcode.** Tracking: the user's token (the record's own `id` is unconfirmed).
 Account: the order's `id`, else `receipt_id`; an order with neither is skipped.
