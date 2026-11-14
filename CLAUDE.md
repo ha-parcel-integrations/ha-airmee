@@ -49,14 +49,14 @@ you act in one of these areas:
 repo)** — endpoints, parameters, the response object and the status
 vocabulary. This section is integration-level decisions only.
 
-**Pre-release, built blind (pre-1.0).** `payload: reconstructed`: the order
-object and the closed `CourierStatus` enum come from the Airmee app's data
-model, not from a captured parcel. Every guess has a one-shot WARNING net
-(unmapped status, schema drift, unreadable time, and — while
-`STATUS_MAP_VALIDATED` is `False` — each mapped value the first time it is
-seen, since the whole map is read off the app rather than a parcel). One consented real parcel
-settles what is still assumed — the checklist is below. Do not move to 1.0.0
-before that.
+**Pre-release (pre-1.0).** The order object and the closed `CourierStatus` enum
+were read off the Airmee app's data model, not off a captured parcel. One
+consented account-route parcel has since settled the dropoff window and two
+formatted status texts; the tracking route and the rest of the checklist below
+are still assumptions, so the WARNING net stays up (unmapped status, schema
+drift, unreadable time, and — while `STATUS_MAP_VALIDATED` is `False` — each
+mapped value the first time it is seen, since the map as a whole is still the
+app's, not a parcel's). Do not move to 1.0.0 before the checklist is clear.
 
 **Two sources in one domain — `tracking/` and `account/` packages.** Each owns
 its client and coordinator; `coordinator.py` at package root is the shared
@@ -112,7 +112,10 @@ shapes are reported by `_warn_shape`, which logs the call and the top-level
 `new_timeline[-1].courier_status`; `courier_status_formatted` is mapped only
 when the raw enum is absent, and only for unambiguous strings. A real
 account-route parcel carried only the text, so there the text map is the status
-source: add each string as it is seen. An unmapped
+source: add each string as it is seen. `picked up` reading as `in_transit` while
+`your product has been picked up` reads as `out_for_delivery` is not a
+contradiction — the app shows "On its way" for the second one, and its courier
+event says the delivery route has started (#3). An unmapped
 value falls back to the newest earlier timeline event that does map, and only
 then to `unknown` — never `delivered`; the one-shot WARNING fires either way.
 `EDIT` is in `_NON_STATUS_CODES`, not the status map: it records that the order

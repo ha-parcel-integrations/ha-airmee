@@ -14,7 +14,7 @@ A custom Home Assistant integration that tracks your [Airmee](https://airmee.com
 - **Account** — log in with your phone number (Airmee texts you a code). Your parcels are discovered automatically, no per-parcel input.
 - **Tracking links** — add the token from each Airmee tracking link yourself, together with your phone number hash.
 
-> ⚠️ **Pre-1.0 release.** Not yet confirmed against a real parcel. Anything the integration cannot read or map is logged once as a warning with a link to report it — please do.
+> ⚠️ **Pre-1.0 release.** Confirmed against a real parcel on the account route only — the tracking-links route has not been seen yet. Anything the integration cannot read or map is logged once as a warning with a link to report it — please do.
 
 ## Contents
 
