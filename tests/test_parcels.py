@@ -78,6 +78,8 @@ def test_status_lookup_ignores_case_and_whitespace():
         ("Delivered", ParcelStatus.DELIVERED),
         ("Out for delivery", ParcelStatus.OUT_FOR_DELIVERY),
         ("Picked up", ParcelStatus.IN_TRANSIT),
+        ("Your product has been picked up", ParcelStatus.OUT_FOR_DELIVERY),
+        ("Courier on route to pickup location", ParcelStatus.IN_TRANSIT),
         ("Unassigned", ParcelStatus.REGISTERED),
         ("Scanned", ParcelStatus.REGISTERED),
         ("Failed", ParcelStatus.PROBLEM),
@@ -108,7 +110,7 @@ def test_unmapped_status_warns_only_once(caplog):
 
 
 # ---------------------------------------------------------------------------
-# time parsing: Unix UTC seconds only
+# time parsing: Unix UTC seconds, as numbers or strings of digits
 # ---------------------------------------------------------------------------
 
 
@@ -127,7 +129,31 @@ def test_to_iso_timestamp_converts_epoch_seconds():
     assert to_iso_timestamp(None) is None
 
 
-@pytest.mark.parametrize("value", [EPOCH * 1000, 0, "2026-04-29", True, [1]])
+@pytest.mark.parametrize("value", [str(EPOCH), f" {EPOCH}\n", f"00{EPOCH}"])
+def test_to_iso_timestamp_converts_a_string_of_digits(value, caplog):
+    parcels_module._unparseable_times_logged.clear()
+    with caplog.at_level("WARNING"):
+        assert to_iso_timestamp(value) == "2026-04-29T12:00:00+00:00"
+    assert "cannot read" not in caplog.text
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        EPOCH * 1000,
+        0,
+        "2026-04-29",
+        True,
+        [1],
+        str(EPOCH * 1000),
+        "0",
+        "",
+        f"{EPOCH}.5",
+        f"-{EPOCH}",
+        "1_777_464_000",
+        "²",
+    ],
+)
 def test_to_iso_timestamp_refuses_other_shapes_and_warns_once(value, caplog):
     parcels_module._unparseable_times_logged.clear()
     with caplog.at_level("WARNING"):
@@ -135,6 +161,14 @@ def test_to_iso_timestamp_refuses_other_shapes_and_warns_once(value, caplog):
         assert to_iso_timestamp(value, "dropoff_eta") is None
     assert caplog.text.count("cannot read") == 1
     assert "dropoff_eta" in caplog.text
+
+
+def test_refused_digit_string_is_reported_as_a_string_without_its_value(caplog):
+    parcels_module._unparseable_times_logged.clear()
+    with caplog.at_level("WARNING"):
+        assert to_iso_timestamp(str(EPOCH * 1000), "dropoff_eta") is None
+    assert "type str" in caplog.text
+    assert str(EPOCH * 1000) not in caplog.text
 
 
 # ---------------------------------------------------------------------------
@@ -229,7 +263,6 @@ def test_capabilities_match_what_normalize_parcel_actually_returns():
         assert with_history["history"] is not None
     # What is not claimed must really be empty.
     assert delivered["weight"] is None and delivered["dimensions"] is None
-    assert active["planned_from"] is None and active["planned_to"] is None
     assert delivered["pickup_point"] is None and delivered["receiver"] is None
 
 
@@ -237,6 +270,14 @@ def test_account_variant_has_no_url():
     parcel = normalize_parcel(active_sample())
     assert parcel["url"] is None
     assert "url" not in CAPABILITIES_BY_VARIANT["Account"]
+
+
+def test_delivery_window_is_claimed_for_the_account_variant_only():
+    """The tracking route's window has not been seen, so only Account claims it."""
+    assert "delivery_window" in CAPABILITIES_BY_VARIANT["Account"]
+    assert "delivery_window" not in CAPABILITIES_BY_VARIANT["Tracking"]
+    parcel = normalize_parcel(active_sample())
+    assert parcel["planned_from"] is not None and parcel["planned_to"] is not None
 
 
 def test_normalize_delivered_parcel():
@@ -270,20 +311,23 @@ def test_active_parcel_is_not_delivered():
     assert parcel["delivered_at"] is None
 
 
-def test_unconfirmed_dropoff_window_is_not_read(monkeypatch):
-    """The ETA fields stay unread until a real response confirms their unit."""
-    assert normalize_parcel(active_sample())["planned_from"] is None
-
-
-def test_validated_dropoff_window_is_read(monkeypatch):
-    monkeypatch.setattr(parcels_module, "PLANNED_TIMES_VALIDATED", True)
+def test_dropoff_window_is_read_from_numbers():
     parcel = normalize_parcel(active_sample())
     assert parcel["planned_from"] == "2026-04-29T10:53:20+00:00"
     assert parcel["planned_to"] == "2026-04-29T12:53:20+00:00"
 
 
-def test_validated_window_falls_back_to_eta_and_collapses_equal_ends(monkeypatch):
-    monkeypatch.setattr(parcels_module, "PLANNED_TIMES_VALIDATED", True)
+def test_dropoff_window_is_read_from_decimal_strings():
+    raw = active_sample()
+    raw["dropoff_earliest_time"] = "1777460000"
+    raw["dropoff_latest_time"] = "1777467200"
+    raw["dropoff_eta"] = "1777463000"
+    parcel = normalize_parcel(raw)
+    assert parcel["planned_from"] == "2026-04-29T10:53:20+00:00"
+    assert parcel["planned_to"] == "2026-04-29T12:53:20+00:00"
+
+
+def test_window_falls_back_to_eta_and_collapses_equal_ends():
     raw = active_sample()
     raw["dropoff_earliest_time"] = None
     parcel = normalize_parcel(raw)
@@ -292,10 +336,37 @@ def test_validated_window_falls_back_to_eta_and_collapses_equal_ends(monkeypatch
     assert normalize_parcel(raw)["planned_to"] is None
 
 
-def test_validated_window_is_cleared_once_delivered(monkeypatch):
-    monkeypatch.setattr(parcels_module, "PLANNED_TIMES_VALIDATED", True)
+def test_unreadable_window_stays_empty_and_warns_once_per_field(caplog):
+    parcels_module._unparseable_times_logged.clear()
+    raw = active_sample()
+    raw["dropoff_earliest_time"] = "soon"
+    raw["dropoff_latest_time"] = "later"
+    raw["dropoff_eta"] = str(EPOCH * 1000)
+    with caplog.at_level("WARNING"):
+        parcel = normalize_parcel(raw)
+        normalize_parcel(raw)
+    assert parcel["planned_from"] is None and parcel["planned_to"] is None
+    assert caplog.text.count("cannot read") == 3
+    assert "soon" not in caplog.text and "later" not in caplog.text
+
+
+def test_window_is_cleared_once_delivered():
     parcel = normalize_parcel(delivered_sample())
     assert parcel["planned_from"] is None and parcel["planned_to"] is None
+
+
+def test_order_with_only_the_formatted_status_and_string_times_is_read():
+    raw = {
+        "courier_status_formatted": "Your product has been picked up",
+        "dropoff_earliest_time": "1777460000",
+        "dropoff_latest_time": "1777478000",
+        "dropoff_eta": "1777462252",
+    }
+    parcel = normalize_parcel(raw)
+    assert parcel["status"] is ParcelStatus.OUT_FOR_DELIVERY
+    assert parcel["raw_status"] == "Your product has been picked up"
+    assert parcel["planned_from"] == "2026-04-29T10:53:20+00:00"
+    assert parcel["planned_to"] == "2026-04-29T15:53:20+00:00"
 
 
 def test_formatted_status_is_used_when_the_raw_enum_is_absent():

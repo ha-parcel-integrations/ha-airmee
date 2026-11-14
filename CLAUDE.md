@@ -110,7 +110,9 @@ shapes are reported by `_warn_shape`, which logs the call and the top-level
 
 **Status: enum first, text as fallback.** The status is
 `new_timeline[-1].courier_status`; `courier_status_formatted` is mapped only
-when the raw enum is absent, and only for unambiguous strings. An unmapped
+when the raw enum is absent, and only for unambiguous strings. A real
+account-route parcel carried only the text, so there the text map is the status
+source: add each string as it is seen. An unmapped
 value falls back to the newest earlier timeline event that does map, and only
 then to `unknown` — never `delivered`; the one-shot WARNING fires either way.
 `EDIT` is in `_NON_STATUS_CODES`, not the status map: it records that the order
@@ -118,11 +120,16 @@ was amended, so it never becomes the status and never warns. Delivered is
 exactly the two `*DROPOFF_CONFIRMED` values. `returning` is unused.
 
 **`None` on purpose** (`CAPABILITIES_BY_VARIANT`: Tracking = `url`, `history`;
-Account = `history`): `planned_from`/`planned_to` stay `None` while
-`PLANNED_TIMES_VALIDATED` is `False` in `parcels.py` (epoch unit/timezone of the
-dropoff fields unconfirmed — flip it, add `delivery_window`, only after a real
-response); `pickup_point`, `receiver`, `weight`, `dimensions` have no confirmed
-source. Times are accepted only as Unix seconds in a plausible range.
+Account = `delivery_window`, `history`): the dropoff fields
+(`dropoff_earliest_time`, `dropoff_latest_time`, `dropoff_eta`) are Unix seconds
+sent as decimal strings, confirmed on the account route only, so there
+`planned_from`/`planned_to` are filled and `delivery_window` is claimed. The
+tracking route is not claimed until its payload has been seen; the normaliser is
+shared, so a window that route sends in the same shape is filled too, and any
+other shape stays `None` with the one-shot WARNING (`PLANNED_TIMES_VALIDATED` is
+the switch). `pickup_point`, `receiver`, `weight`, `dimensions` have no
+confirmed source. Times are accepted only as Unix seconds in a plausible range,
+as a number or a string of digits.
 
 **Barcode.** Tracking: the user's token (the record's own `id` is unconfirmed).
 Account: the order's `id`, else `receipt_id`; an order with neither is skipped.
@@ -138,10 +145,11 @@ lat/lng, token, hash, url, pin, qr…) — keys are kept, values replaced.
 
 **Still to confirm with a real parcel:** the raw enum is present on the
 tracking route; the hash boundary; whether `id`/`receipt_id` is stable and
-non-personal; the epoch unit/timezone of the dropoff fields; the shape of
-`collection_point`/`parcel_locker`; the consumer URL shape; the accepted
-`country_code` format (entered verbatim); the exact shape of the refresh and
-`deliveries` responses.
+non-personal; whether the tracking route sends the dropoff fields in the same
+shape as the account route (Unix seconds as decimal strings, confirmed there);
+the shape of `collection_point`/`parcel_locker`; the consumer URL shape; the
+accepted `country_code` format (entered verbatim); the exact shape of the
+refresh and `deliveries` responses.
 
 ## Options and reloads
 
