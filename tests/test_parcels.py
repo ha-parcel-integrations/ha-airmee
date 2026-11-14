@@ -152,6 +152,7 @@ def test_to_iso_timestamp_converts_a_string_of_digits(value, caplog):
         f"-{EPOCH}",
         "1_777_464_000",
         "²",
+        "9" * 5000,
     ],
 )
 def test_to_iso_timestamp_refuses_other_shapes_and_warns_once(value, caplog):

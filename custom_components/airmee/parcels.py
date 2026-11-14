@@ -86,6 +86,7 @@ PLANNED_TIMES_VALIDATED = True
 # (milliseconds, a stray zero) is refused rather than guessed at.
 _EPOCH_MIN = 1_420_070_400
 _EPOCH_MAX = 4_102_444_800
+_EPOCH_MAX_DIGITS = 20
 
 # The enum map is read off the app's own status list, not off a parcel anyone
 # has tracked, so every mapping is a guess. Flip this to ``True`` once a real
@@ -208,7 +209,9 @@ def to_iso_timestamp(value: Any, field: str = "timestamp") -> str | None:
     number = value
     if isinstance(value, str):
         text = value.strip()
-        if text.isascii() and text.isdigit():
+        # Length-capped: int() on a very long digit string raises instead of
+        # converting, and every shape this cannot read has to come back None.
+        if len(text) <= _EPOCH_MAX_DIGITS and text.isascii() and text.isdigit():
             number = int(text)
     if isinstance(number, (int, float)) and not isinstance(number, bool):
         if _EPOCH_MIN <= number <= _EPOCH_MAX:
