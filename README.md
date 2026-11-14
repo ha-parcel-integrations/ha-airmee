@@ -114,11 +114,13 @@ what your tracked parcels are actually doing:
 - A small, fixed per-hub offset is added on top, so not every Airmee
   hub out there polls at exactly the same second.
 
-Airmee's delivery window is not read yet, so nothing is ever scheduled by
-time: a parcel that is out for delivery is always polled on the 15-minute
-schedule. Account mode never pauses — the inbox poll is also how new parcels
-are found — and falls back to the 45-minute schedule when nothing is out for
-delivery. Tracking links mode pauses as described above.
+Account mode reads Airmee's delivery window, so a parcel that is out for
+delivery is polled every 45 minutes until an hour before its window opens, and
+every 15 minutes from then on. A parcel without a readable window (tracking
+links mode: not confirmed yet) is polled every 15 minutes right away. Account
+mode never pauses — the inbox poll is also how new parcels are found — and
+falls back to the 45-minute schedule when nothing is out for delivery.
+Tracking links mode pauses as described above.
 
 
 ## Removal
@@ -131,7 +133,7 @@ Standard HA removal applies: **Settings → Devices & Services → Airmee → �
 |---|---|
 | `sensor.airmee_incoming_parcels` | Number of active tracked parcels, full list under the `parcels` attribute |
 | `sensor.airmee_parcel_<code>` | One per tracked parcel; state is the canonical status, attributes carry the full normalised parcel |
-| `sensor.airmee_next_delivery` | Earliest expected delivery moment across all active parcels. Airmee's delivery-window fields are not yet confirmed, so this stays `unknown` until a real parcel settles them (see Pre-release) |
+| `sensor.airmee_next_delivery` | Earliest expected delivery moment across all active parcels: the start of Airmee's delivery window. Account mode reads it; in tracking links mode the window has not been confirmed yet, so this can stay `unknown` |
 | `sensor.airmee_en_route_to_pickup_point` | Incoming parcels on their way to a pickup point that have not arrived yet |
 | `sensor.airmee_awaiting_pickup` | Incoming parcels that are ready to collect at a pickup point |
 | `sensor.airmee_delivered_parcels` | Recently delivered parcels (see the retention option) |

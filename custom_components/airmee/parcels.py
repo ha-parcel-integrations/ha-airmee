@@ -70,15 +70,17 @@ _FORMATTED_STATUS_MAP: dict[str, ParcelStatus] = {
     "delivered": ParcelStatus.DELIVERED,
     "out for delivery": ParcelStatus.OUT_FOR_DELIVERY,
     "picked up": ParcelStatus.IN_TRANSIT,
+    "your product has been picked up": ParcelStatus.OUT_FOR_DELIVERY,
+    "courier on route to pickup location": ParcelStatus.IN_TRANSIT,
     "unassigned": ParcelStatus.REGISTERED,
     "scanned": ParcelStatus.REGISTERED,
     "failed": ParcelStatus.PROBLEM,
     "returned": ParcelStatus.RETURNING,
 }
 
-# Window times are not read until an ETA field has been seen on the wire with a
-# known epoch unit and timezone; the capability is not claimed either.
-PLANNED_TIMES_VALIDATED = False
+# The dropoff window fields are Unix seconds sent as decimal strings (confirmed
+# on the account route).
+PLANNED_TIMES_VALIDATED = True
 
 # Plausible Unix-seconds range (2015-01-01 .. 2100-01-01). Anything outside it
 # (milliseconds, a stray zero) is refused rather than guessed at.
@@ -197,14 +199,20 @@ _unparseable_times_logged: set[str] = set()
 def to_iso_timestamp(value: Any, field: str = "timestamp") -> str | None:
     """Return an ISO 8601 UTC string for an Airmee epoch-seconds field.
 
-    Numbers outside the plausible Unix-seconds range are refused (``None``)
+    The field is a number or a string of decimal digits. Anything else, and
+    numbers outside the plausible Unix-seconds range, are refused (``None``)
     with a one-shot warning naming the field, never the value.
     """
     if value is None:
         return None
-    if isinstance(value, (int, float)) and not isinstance(value, bool):
-        if _EPOCH_MIN <= value <= _EPOCH_MAX:
-            return datetime.fromtimestamp(value, tz=timezone.utc).isoformat()
+    number = value
+    if isinstance(value, str):
+        text = value.strip()
+        if text.isascii() and text.isdigit():
+            number = int(text)
+    if isinstance(number, (int, float)) and not isinstance(number, bool):
+        if _EPOCH_MIN <= number <= _EPOCH_MAX:
+            return datetime.fromtimestamp(number, tz=timezone.utc).isoformat()
     if field not in _unparseable_times_logged:
         _unparseable_times_logged.add(field)
         _LOGGER.warning(

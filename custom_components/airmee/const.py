@@ -37,20 +37,20 @@ KNOWN_CAPABILITIES = frozenset(
 )
 
 # Claimed only where normalize_parcel() fills the field from a real value.
-# ``delivery_window`` is not claimed: the epoch unit of the dropoff window has
-# not been seen on the wire, so planned_from / planned_to stay ``None``.
+# ``delivery_window`` is claimed for the account inbox only: its dropoff window
+# has been seen on the wire, the tracking route's has not.
 # ``weight``, ``dimensions`` and ``pickup_point`` have no confirmed source field.
 # The account inbox has no tracking token to build a ``url`` from.
 CAPABILITIES_BY_VARIANT = {
     "Tracking": frozenset({"url", "history"}),
-    "Account": frozenset({"history"}),
+    "Account": frozenset({"delivery_window", "history"}),
 }
 
 # Fields not confirmed yet — the docs site shows them as "awaiting data".
 # Move a field into the declaration above once a real parcel shows it.
 PENDING_CAPABILITIES_BY_VARIANT = {
     "Tracking": frozenset({"delivery_window", "pickup_point"}),
-    "Account": frozenset({"delivery_window", "pickup_point"}),
+    "Account": frozenset({"pickup_point"}),
 }
 # Aliased to the tracking source, as the flat shape the parcel tests check.
 CAPABILITIES = CAPABILITIES_BY_VARIANT["Tracking"]

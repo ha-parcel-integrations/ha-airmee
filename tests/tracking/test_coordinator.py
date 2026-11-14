@@ -8,7 +8,6 @@ from unittest.mock import AsyncMock
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.airmee import parcels as parcels_module
 from custom_components.airmee.const import (
     CONF_DELIVERED_FILTER_AMOUNT,
     CONF_DELIVERED_FILTER_TYPE,
@@ -412,8 +411,7 @@ async def test_fires_registered_event_for_new_parcel(hass):
     assert events[0].data["barcode"] == OTHER_CODE
 
 
-async def test_fires_delivery_time_changed_event(hass, monkeypatch):
-    monkeypatch.setattr(parcels_module, "PLANNED_TIMES_VALIDATED", True)
+async def test_fires_delivery_time_changed_event(hass):
     entry = _entry_with([{CONF_TRACKING_CODE: ACTIVE_CODE}])
     entry.add_to_hass(hass)
     client = AsyncMock()
@@ -439,8 +437,7 @@ async def test_fires_delivery_time_changed_event(hass, monkeypatch):
     assert events[0].data["new_planned_from"] == "2026-04-29T13:40:00+00:00"
 
 
-async def test_losing_the_eta_is_silent(hass, monkeypatch):
-    monkeypatch.setattr(parcels_module, "PLANNED_TIMES_VALIDATED", True)
+async def test_losing_the_eta_is_silent(hass):
     """value -> null just means the carrier lost the window; not worth an alert."""
     entry = _entry_with([{CONF_TRACKING_CODE: ACTIVE_CODE}])
     entry.add_to_hass(hass)
