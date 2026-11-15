@@ -9,7 +9,7 @@
 >
 > 💬 Questions or feedback? Join the discussion on the [Home Assistant community](https://community.home-assistant.io/t/packages-postnl-dhl-nl-dpd-and-gls-parcel-integration/112433/).
 
-A custom Home Assistant integration that tracks your [Airmee](https://airmee.com) parcels (Sweden). Two ways to follow them, chosen when you add the integration:
+A custom Home Assistant integration that tracks your [Airmee](https://airmee.com) parcels (Sweden and Denmark). Two ways to follow them, chosen when you add the integration:
 
 - **Account** — log in with your phone number (Airmee texts you a code). Your parcels are discovered automatically, no per-parcel input.
 - **Tracking links** — add the token from each Airmee tracking link yourself, together with your phone number hash.
