@@ -458,6 +458,14 @@ def test_delivered_without_readable_time_keeps_delivered():
     assert parcel["delivered_at"] is None
 
 
+def test_delivered_without_timeline_takes_the_time_from_dropoff_eta():
+    raw = {"courier_status_formatted": "Delivered", "dropoff_eta": str(EPOCH)}
+    parcel = normalize_parcel(raw)
+    assert parcel["delivered"] is True
+    assert parcel["delivered_at"] == "2026-04-29T12:00:00+00:00"
+    assert parcel["planned_from"] is None
+
+
 def test_normalize_history_is_opt_in():
     parcel = normalize_parcel(delivered_sample(), include_history=True)
     assert [h["raw_status"] for h in parcel["history"]][-1] == "DROPOFF_CONFIRMED"
