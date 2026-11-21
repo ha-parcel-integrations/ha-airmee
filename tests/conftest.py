@@ -27,6 +27,18 @@ def reset_one_shot_warnings():
     yield
 
 
+@pytest.fixture
+def stockholm():
+    """Pin Home Assistant's default zone, which end-of-day windows are built in."""
+    from homeassistant.util import dt as dt_util
+
+    previous = dt_util.get_default_time_zone()
+    zone = dt_util.get_time_zone("Europe/Stockholm")
+    dt_util.set_default_time_zone(zone)
+    yield zone
+    dt_util.set_default_time_zone(previous)
+
+
 if sys.platform == "win32":
     # pytest-homeassistant-custom-component blocks socket *creation*
     # (``disable_socket(allow_unix_socket=True)``) in its per-test setup hook.

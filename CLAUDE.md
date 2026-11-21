@@ -35,13 +35,15 @@ you act in one of these areas:
   summary+diagnostic sensors. Add a new non-parcel sensor's unique_id to the set.
 - **Per-parcel sensors are removed by the summary sensor** via
   `entity_registry.async_remove` (self-removal races and leaves ghosts).
-- **The optional pickup-point summaries are a pair.** A carrier that can tell
-  a parcel is destined for a pickup point exposes
-  `en_route_to_pickup_point` for `pickup is true` before it arrives; one that
-  can reach `ParcelStatus.AT_PICKUP_POINT` also exposes `awaiting_pickup`.
+- **The pickup-point summaries are a pair.** A carrier that can deliver to a
+  pickup point or locker exposes both `en_route_to_pickup_point` and
+  `awaiting_pickup`, even before a real parcel has shown the status or flag
+  (they read 0 until then; record it in `PENDING_*`). A carrier without pickup
+  points exposes neither and keeps `pickup` constantly False.
   See *Parcel contract* in `CONVENTIONS.md`. Say "pickup point", not
   "ServicePoint"/"parcel shop"/"locker", for the generic concept; the
   example carrier demonstrates both canonical sensors.
+  Airmee exposes both (see *Window, pickup and sensors* below).
 
 ## Carrier-specific notes
 
@@ -121,6 +123,20 @@ then to `unknown` — never `delivered`; the one-shot WARNING fires either way.
 `EDIT` is in `_NON_STATUS_CODES`, not the status map: it records that the order
 was amended, so it never becomes the status and never warns. Delivered is
 exactly the two `*DROPOFF_CONFIRMED` values. `returning` is unused.
+
+**Window, pickup and sensors.** `planned_from`/`planned_to` come from
+`planned_window` (zone: Home Assistant's, because Airmee spans several
+countries): a window keeps both ends, a lone moment (`dropoff_eta`, equal ends)
+ends at 23:59:59 that day. `planned_for_status` empties them at
+`at_pickup_point`, `returning` and `delivered`. `delivered_at` is the newest
+`DELIVERED`-mapped event's time (so a later `EDIT` does not move it), else
+`dropoff_eta`. `pickup` is `is_pickup(None, ...)`: Airmee has no route field, so
+it turns true when a timeline event reaches `at_pickup_point` and stays true
+after collection; `pickup_point` stays `None` (no source). `pickup` is only
+known on arrival, so `en_route_to_pickup_point` (pickup parcels not yet at the
+point and not returning) reads 0 until Airmee reveals a pickup point earlier;
+that is a pending item, not a reason to drop the sensor. `awaiting_pickup`
+lists parcels at the point.
 
 **`None` on purpose** (`CAPABILITIES_BY_VARIANT`: Tracking = `url`, `history`;
 Account = `delivery_window`, `history`): the dropoff fields

@@ -1,6 +1,6 @@
 """Tests for the Airmee deliveries calendar."""
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from unittest.mock import MagicMock
 
 from custom_components.airmee.calendar import AirmeeDeliveriesCalendar
@@ -93,6 +93,20 @@ def test_naive_planned_from_treated_as_utc():
 
 def test_unparseable_planned_from_skipped():
     assert _cal([_parcel("A", planned_from="not-a-date")]).event is None
+
+
+def test_a_whole_day_window_is_an_all_day_event():
+    cal = _cal(
+        [
+            _parcel(
+                "A",
+                planned_from="2099-01-01T00:00:00-07:00",
+                planned_to="2099-01-01T23:59:59-07:00",
+            )
+        ]
+    )
+    event = cal._events()[0]
+    assert (event.start, event.end) == (date(2099, 1, 1), date(2099, 1, 2))
 
 
 async def test_get_events_filters_by_range():

@@ -133,8 +133,8 @@ Standard HA removal applies: **Settings → Devices & Services → Airmee → �
 |---|---|
 | `sensor.airmee_incoming_parcels` | Number of active tracked parcels, full list under the `parcels` attribute |
 | `sensor.airmee_parcel_<code>` | One per tracked parcel; state is the canonical status, attributes carry the full normalised parcel |
-| `sensor.airmee_next_delivery` | Earliest expected delivery moment across all active parcels: the start of Airmee's delivery window. Account mode reads it; in tracking links mode the window has not been confirmed yet, so this can stay `unknown` |
-| `sensor.airmee_en_route_to_pickup_point` | Incoming parcels on their way to a pickup point that have not arrived yet |
+| `sensor.airmee_next_delivery` | Earliest expected delivery moment across all active parcels: the start of Airmee's delivery window. A parcel whose window has passed is skipped. Account mode reads it; in tracking links mode the window has not been confirmed yet, so this can stay `unknown` |
+| `sensor.airmee_en_route_to_pickup_point` | Incoming parcels on their way to a pickup point that have not arrived yet. Airmee only reveals a pickup point on arrival, so this reads 0 until it shows one earlier |
 | `sensor.airmee_awaiting_pickup` | Incoming parcels that are ready to collect at a pickup point |
 | `sensor.airmee_delivered_parcels` | Recently delivered parcels (see the retention option) |
 | `calendar.airmee_deliveries` | Read-only calendar of expected deliveries, no extra API calls |

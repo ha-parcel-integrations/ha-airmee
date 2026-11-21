@@ -196,3 +196,27 @@ async def test_stale_parcel_sensors_are_swept_at_setup(hass):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
     assert registry.async_get(stale.entity_id) is None
+
+
+async def test_pickup_sensors_are_registered_and_not_swept(hass):
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id=DOMAIN,
+        data={"phone_number_hash": "hash01"},
+        options={CONF_PARCELS: [{CONF_TRACKING_CODE: ACTIVE_CODE}]},
+    )
+    entry.add_to_hass(hass)
+    registry = er.async_get(hass)
+    awaiting = registry.async_get_or_create(
+        "sensor", DOMAIN, f"{entry.entry_id}_awaiting_pickup", config_entry=entry
+    )
+    with patch(
+        "custom_components.airmee.tracking.api.AirmeeApiClient.async_get_parcel",
+        new=AsyncMock(return_value=_sample()),
+    ):
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+    assert registry.async_get(awaiting.entity_id) is not None
+    assert registry.async_get_entity_id(
+        "sensor", DOMAIN, f"{entry.entry_id}_en_route_to_pickup_point"
+    )

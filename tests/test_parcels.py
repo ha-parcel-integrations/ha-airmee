@@ -328,13 +328,15 @@ def test_dropoff_window_is_read_from_decimal_strings():
     assert parcel["planned_to"] == "2026-04-29T12:53:20+00:00"
 
 
-def test_window_falls_back_to_eta_and_collapses_equal_ends():
+def test_window_falls_back_to_eta_and_stretches_equal_ends(stockholm):
     raw = active_sample()
     raw["dropoff_earliest_time"] = None
     parcel = normalize_parcel(raw)
     assert parcel["planned_from"] == "2026-04-29T11:43:20+00:00"
     raw["dropoff_earliest_time"] = raw["dropoff_latest_time"] = 1_777_460_000
-    assert normalize_parcel(raw)["planned_to"] is None
+    parcel = normalize_parcel(raw)
+    assert parcel["planned_from"] == "2026-04-29T10:53:20+00:00"
+    assert parcel["planned_to"] == "2026-04-29T23:59:59+02:00"
 
 
 def test_unreadable_window_stays_empty_and_warns_once_per_field(caplog):
