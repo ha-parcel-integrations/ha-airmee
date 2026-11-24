@@ -30,6 +30,7 @@ from .const import (
     STAGGER_MINUTES,
     ParcelStatus,
 )
+from .contents import ContentsStore, normalize_code
 from .parcels import apply_delivered_filter, sort_parcels_by_ts
 
 _LOGGER = logging.getLogger(__name__)
@@ -145,6 +146,10 @@ class AirmeeBaseCoordinator(DataUpdateCoordinator[list[dict]]):
             update_interval=timedelta(minutes=HOT_INTERVAL_MINUTES),
         )
         self._client = client
+        self.contents_store = ContentsStore(hass, entry.entry_id)
+        # Every code this entry lists, delivered ones past the retention filter
+        # included: update_contents asks which entry a code belongs to.
+        self.known_codes: frozenset[str] = frozenset()
         self.delivered: list[dict] = []
         # The whole order records behind this cycle's parcels, for diagnostics
         # only: they hold what ``published_raw`` keeps out of state and events.
@@ -204,8 +209,19 @@ class AirmeeBaseCoordinator(DataUpdateCoordinator[list[dict]]):
             self.config_entry.options.get(CONF_INCLUDE_HISTORY, DEFAULT_INCLUDE_HISTORY)
         )
 
+    def _apply_contents(self, parcel: dict) -> dict:
+        """Put the user's own contents text over the carrier's, when there is one."""
+        user_value = self.contents_store.get(parcel["barcode"])
+        if user_value is not None:
+            parcel["contents"] = user_value
+        return parcel
+
     def _publish(self, parcels: list[dict], *, stamp_success: bool) -> list[dict]:
         """Split normalised parcels, fire events and schedule the next poll."""
+        parcels = [self._apply_contents(parcel) for parcel in parcels]
+        self.known_codes = frozenset(
+            normalize_code(parcel["barcode"]) for parcel in parcels if parcel["barcode"]
+        )
         active = [parcel for parcel in parcels if not parcel["delivered"]]
         delivered = [parcel for parcel in parcels if parcel["delivered"]]
 

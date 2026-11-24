@@ -98,6 +98,7 @@ def _entry(data: dict) -> MagicMock:
             "barcode": "tok",
             "sender": "Example Shop",
             "receiver": "Jane Doe",
+            "contents": "Running shoes",
             "url": "https://tracking.airmee.com/track/tok",
             "status": "out_for_delivery",
             "raw": published_raw(active_sample()),
@@ -130,6 +131,7 @@ async def test_diagnostics_redacts_credentials_and_payload_pii(hass):
     incoming = result["incoming"][0]
     assert incoming["barcode"] == REDACTED
     assert incoming["receiver"] == REDACTED
+    assert incoming["contents"] == REDACTED
     assert incoming["url"] == REDACTED
     assert "pin" not in incoming["raw"]
     assert "receiver_name" not in incoming["raw"]

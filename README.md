@@ -44,6 +44,7 @@ A custom Home Assistant integration that tracks your [Airmee](https://airmee.com
 - Summary sensors: incoming parcels, next delivery, recently delivered parcels
 - Read-only **Deliveries** calendar of your active parcels
 - `airmee.track_parcel` / `airmee.untrack_parcel` services (tracking links mode), so a dashboard button can add a parcel
+- `airmee.update_contents` to note what is in a parcel; it titles the calendar event and shows on the next-delivery sensor
 - Events + device triggers for no-code automations (parcel registered, status changed, delivered, delivery time changed)
 - Opt-in per-parcel status history
 - Manual refresh button and a diagnostic last-update sensor
@@ -177,8 +178,13 @@ Every payload is the full normalised parcel plus the hub's `device_id`. Events a
 
 | Service | Fields | Description |
 |---|---|---|
-| `airmee.track_parcel` | `tracking_code` | Start tracking a parcel |
+| `airmee.track_parcel` | `tracking_code`, `contents` (optional) | Start tracking a parcel, optionally noting what is in it |
 | `airmee.untrack_parcel` | `tracking_code` | Stop tracking a parcel |
+| `airmee.update_contents` | `tracking_code`, `contents`, `config_entry_id` (optional) | Set what is in a parcel, tracked or not; an empty `contents` clears it. It goes to every entry that lists the code; name one with `config_entry_id` (needed for a code none lists yet). |
+
+`track_parcel` and `untrack_parcel` act on the tracking links entry only, and are not registered while only an account is set up. `update_contents` works with any set-up entry.
+
+The `contents` text you set is stored locally, is part of the normalised parcel as `contents`, titles the parcel's calendar event and shows on the next-delivery sensor.
 
 ## Examples
 

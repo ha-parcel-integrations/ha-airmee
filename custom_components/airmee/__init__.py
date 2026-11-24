@@ -21,6 +21,7 @@ from .const import (
     SOURCE_ACCOUNT,
     SOURCE_TRACKING,
 )
+from .contents import ContentsStore
 from .services import async_setup_services, async_unload_services
 from .tracking.api import AirmeeApiClient
 from .tracking.coordinator import AirmeeCoordinator
@@ -82,6 +83,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: AirmeeConfigEntry) -> bo
     # cleanly (it logs a warning and half-sets-up the entry); doing the first
     # refresh here lets a transient failure fail the whole entry so HA retries
     # it with backoff.
+    await coordinator.contents_store.async_load()
     await coordinator.async_config_entry_first_refresh()
 
     entry.runtime_data = AirmeeData(client=client, coordinator=coordinator)
@@ -95,8 +97,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: AirmeeConfigEntry) -> bo
     # the tier and re-arms scheduling.
     entry.async_on_unload(entry.add_update_listener(_async_options_updated))
 
-    if not is_account_entry(entry):
-        async_setup_services(hass)
+    async_setup_services(hass, hub=not is_account_entry(entry))
 
     return True
 
@@ -110,14 +111,18 @@ async def async_unload_entry(hass: HomeAssistant, entry: AirmeeConfigEntry) -> b
     """Unload the Airmee config entry."""
     if not await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         return False
-    # The services belong to tracking entries only: drop them when the last
-    # loaded one goes.
-    others_loaded = any(
-        other.entry_id != entry.entry_id
-        and other.state is ConfigEntryState.LOADED
-        and not is_account_entry(other)
+    # Drop a service when the last entry that needs it goes, so unloading one
+    # entry never breaks the others.
+    others = [
+        other
         for other in hass.config_entries.async_entries(DOMAIN)
-    )
-    if not is_account_entry(entry) and not others_loaded:
-        async_unload_services(hass)
+        if other.entry_id != entry.entry_id and other.state is ConfigEntryState.LOADED
+    ]
+    hubs_left = any(not is_account_entry(other) for other in others)
+    async_unload_services(hass, hubs_left=hubs_left, entries_left=bool(others))
     return True
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: AirmeeConfigEntry) -> None:
+    """Delete the entry's stored contents."""
+    await ContentsStore(hass, entry.entry_id).async_remove()

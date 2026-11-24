@@ -19,6 +19,7 @@ TO_REDACT = {
     "barcode",
     "sender",
     "receiver",
+    "contents",
     "url",
     # credentials and login material
     "phone_number_hash",
